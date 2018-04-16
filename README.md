@@ -19,10 +19,10 @@ In addition to that we enhance the classification accuracy by proposing a novel 
 
 ## Usage
 ```python
-python airynet.py flags
-
-Possible flags: # see for yourself in nn/config.py
-
+python airynet.py --flags=value
+```
+Possible flags, declared in _nn/config.py_:
+```
 # Network
 '--resnet_size',
     type=int,
