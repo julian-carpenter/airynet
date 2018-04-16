@@ -13,9 +13,9 @@ A residual convolutional DNN (ResNet) is trained in a supervised manner utilizin
 In addition to that we enhance the classification accuracy by proposing a novel activation function, which takes the intrinsic scaling of diffraction pattern into account, and benchmark two widely used DNN architectures. Furthermore, an approach to be more robust to highly noisy data using two-point cross correlation maps is presented. We conduct all experiments on two large datasets, first, data from a wide-angle X-ray scattering (WAXS) experiment on Helium nanodroplets, conducted at the LDM endstation of the FERMI free-electron laser in Trieste, and second, a small-angle X-ray scattering (SAXS) dataset from the CXI-database (CXIDB) , provided as part of an ongoing effort to advance the programmatic and algorithmic description of diffraction images .
 
 ## Requirements
-* Python 3.6+ (Mainly because of the _print(''.format))_ statements)
-* Tensorflow 1.2+ (Tested on 1.4 though)
-* The usual Python packages (os, glob, datetime, tqdm, argparse and numpy)
+* Python 3.6+ (Mainly because of the _print("...{}...".format(...)))_ statements)
+* Tensorflow 1.4+ (Only tested on 1.7 though)
+* The usual Python packages (os, glob, datetime, tqdm, argparse, cv2, h5py and numpy)
 
 ## Usage
 ```python
