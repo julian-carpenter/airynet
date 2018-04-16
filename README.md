@@ -19,7 +19,7 @@ In addition to that we enhance the classification accuracy by proposing a novel 
 
 ## Usage
 ```python
-python airynet.py --flags=flag_value
+python airynet.py flags
 
 Possible flags: # see for yourself in nn/config.py
 
