@@ -1,35 +1,13 @@
-# Machine-Learning assisted classification of diffraction images
-## Overview
+# Using deep neural nets for classification of diffraction images
 
-With the recent advent of short wavelength Free-Electron-Laser (FEL)
-it is possible to obtain high-intensity x-ray pulses with femtosecond
-duration. This allows for coherent diffraction imaging (CDI) experiments
-on individual nanosized objects with a single x-ray laser shot.
+## Description
 
-At the “LINAC Coherent Light Source” (LCLS), for instance, with a
-repetition rate of 120 Hz a typical hit-ratio of 20 % can be achieved [^1] [^2] .
-The European XFEL facility will even top that with a maximum repetition
-rate of 27 000 Hz [^3]. This may add up to several million diffraction pattern
-in a single 12 hour shift. While storing such large amounts of data
-is feasible, this mere data volume represents a severe problem
-for the data analysis.
+This is the code for the paper _Using deep neural nets for classification of diffraction images_, Zimmermann et al. 2018, doi: 000
 
-We here propose a workflow scheme to drastically reduce the amount
-of work needed for the categorization of large data-sets of diffraction
-patterns. First a classification and viewer is used for classifying
-manually selected high quality diffraction pattern. These patterns are
-then used as training data for a Residual Convolutional Neural Network
-(RCNN). The RCNN is designed for the classification of data for
-efficient indexing and subsequent analysis.
 
-[^1]: *Emma, et al. First lasing and operation of an ångstrom-wavelength free-electron laser. Nat. Photonics, 4(9):641–647, 2010. ISSN 1749-4885. doi: 10.1038/nphoton.2010.176.*
+## Abstract
 
-[^2]: *Bostedt, et al. Linac Coherent Light Source: The first five years. Rev. Mod. Phys., 88(1):015007, 2016. ISSN 0034-6861. doi: 10.1103/RevModPhys.88.015007.*
-
-[^3]: *Schneidmiller. Photon beam properties at the European XFEL. Technical report, XFEL, Hamburg, 2011.*
-
-[^4]: *He, et al. Deep Residual Learning for Image Recognition. 2015.*
-
-[^5]: *Szegedy, et al. Inception-v4, Inception-airynet and the Impact of Residual Connections on Learning. 2016.*
-
-[^6]: *He, et al. Identity Mappings in Deep Residual Networks. 2016.*
+Intense short-wavelength pulses from Free-Electron-Lasers (FELs) and high-harmonic-generation (HHG) sources enable diffractive imaging of individual nano-sized objects with a single x-ray laser shot. Due to the high repetition rates, large data sets with up to several million diffraction patterns are typically obtained in FEL particle diffraction experiments, representing a severe problem for data analysis. Assuming a dataset of K diffraction patterns with M x N pixels, a high dimensional space (K x M x N) has to be analyzed. Thus feature selection is crucial as it reduces the dimensionality. This is typically achieved via custom-made algorithms that do not generalize well, e.g. feature extraction methods applicable to spherically shaped patterns but not to arbitrary shapes. This work exploits the possibility to utilize a deep neural network (DNN) as a feature extractor.
+% A workflow scheme is proposed based on a residual convolutional neural net (ResNet), that drastically reduces the amount of work needed for the classification of large diffraction datasets, only a small fraction of the data has to be manually classified.
+A residual convolutional DNN (ResNet) is trained in a supervised manner utilizing a small training set of manually labeled data.
+In addition to that we enhance the classification accuracy by proposing a novel activation function, which takes the intrinsic scaling of diffraction pattern into account, and benchmark two widely used DNN architectures. Furthermore, an approach to be more robust to highly noisy data using two-point cross correlation maps is presented. We conduct all experiments on two large datasets, first, data from a wide-angle X-ray scattering (WAXS) experiment on Helium nanodroplets, conducted at the LDM endstation of the FERMI free-electron laser in Trieste, and second, a small-angle X-ray scattering (SAXS) dataset from the CXI-database (CXIDB) , provided as part of an ongoing effort to advance the programmatic and algorithmic description of diffraction images .
