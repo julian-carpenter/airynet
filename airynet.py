@@ -13,7 +13,6 @@ import nn
 import tensorflow as tf
 from tqdm import tqdm
 from numpy import save
-from scipy.io import savemat
 
 
 def get_time():
@@ -43,7 +42,7 @@ def main(cfg):
     else:
         model_dir = cfg.load_dir
 
-    print(model_dir)
+    print('Model directory: {}'.format(model_dir))
 
     with tf.device('/cpu:0'):
         run_config_obj = tf.contrib.learn.RunConfig(
@@ -112,9 +111,6 @@ def main(cfg):
                 save(
                     os.path.join(os.path.curdir, 'predictions',
                                  '{}.npy'.format(cfg.dataset)), out_dict)
-            #     savemat(
-            #         os.path.join(os.path.curdir, 'predictions',
-            #                      '{}.mat'.format(cfg.dataset)), out_dict)
         elif cfg.mode == 'save':
             # Use the trained network to predict
             # path_to_saved_model = airynet_classifier.export_savedmodel(
