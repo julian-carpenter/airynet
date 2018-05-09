@@ -3,7 +3,7 @@ The config parameter
 
 Author:
 Julian Zimmermann
-mail: j.zimmermann@mbi-berlin.de
+mail: julian.zimmermann@mbi-berlin.de
 github: julian-carpenter
 '''
 import argparse as ap
@@ -47,34 +47,20 @@ net_arg.add_argument(
 # Data
 data_arg = add_argument_group('Data')
 data_arg.add_argument(
+    '--data_dir',
+    type=str,
+    default='../datasets/',
+    help='This path is a prefix for the dataset flag.')
+data_arg.add_argument(
     '--dataset',
     type=str,
     default='cxidb',
-    choices=['helium', 'cxidb'],
-    help='Name of the dataset. Has to be a folder -> data_dir/dataset. '
-    'Currently the datasets described in the paper are the only ones '
-    'that are supported. Feel free to add others.')
-data_arg.add_argument(
-    '--fraction_mode',
-    type=str2bool,
-    default=False,
-    help='Use smaller training datasets. (testing only)')
-data_arg.add_argument(
-    '--fraction',
-    type=float,
-    default=0.25,
-    choices=[0.25, 0.5, 0.75],
-    help='Use smaller training datasets. (testing only)')
+    help='Name of the dataset. Has to be a folder -> data_dir/dataset')
 data_arg.add_argument(
     '--log_dir',
     type=str,
     default='logs',
     help='The directory where the model will be stored.')
-data_arg.add_argument(
-    '--data_dir',
-    type=str,
-    default='../datasets/',
-    help='This path is a prefix for the dataset flag.')
 data_arg.add_argument(
     '--load_dir',
     type=str,
@@ -209,18 +195,6 @@ train_arg.add_argument(
     type=float,
     default=0.,
     help='beta value for the log activation (only if --use_log_act is True)')
-train_arg.add_argument(
-    '--add_noise',
-    type=int,
-    default=0,
-    choices=[0, 1, 2, 3],
-    help='use the noise-added version from the input images (testing only)')
-train_arg.add_argument(
-    '--use_ccf',
-    type=str2bool,
-    default=False,
-    help=
-    'use the two-point cross-correlation of the input images (testing only)')
 train_arg.add_argument(
     '--use_nchw',
     type=str2bool,

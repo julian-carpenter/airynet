@@ -14,8 +14,8 @@ In addition to that we enhance the classification accuracy by proposing a novel 
 
 ## Requirements
 * Python 3.6+ (Mainly because of the _print("...{}...".format(...)))_ statements)
-* Tensorflow 1.4+ (Only tested on 1.7 though)
-* The usual Python packages (os, glob, datetime, tqdm, argparse, cv2, h5py and numpy)
+* _Tensorflow_ 1.4+ (Only tested on 1.7 though)
+* The following Python packages: _os_, _glob_, _datetime_, _tqdm_, _argparse_, _cv2_, _h5py_ and _numpy_
 
 ## Usage
 ```python
@@ -35,21 +35,15 @@ Possible flags: # declared in _nn/config.py_
     help='The architecture that is used')
 
 # Data
-'--dataset',
-    type=str,
-    help='Name of the dataset. Folder in cfg.data_dir/cfg.dataset')
-'--fraction_mode',
-    type=str2bool,
-    help='For testing purposes. Use smaller training datasets')
-'--fraction',
-    type=float,
-    help='For testing purposes. Use smaller training datasets')
-'--log_dir',
-    type=str,
-    help='The directory where the model will be stored.')
 '--data_dir',
     type=str,
     help='This path is a prefix for the dataset flag.')
+'--dataset',
+    type=str,
+    help='Name of the dataset. Folder in cfg.data_dir/cfg.dataset')
+'--log_dir',
+    type=str,
+    help='The directory where the model will be stored.')
 '--load_dir',
     type=str,
     help='Restore the network graph from there. Leave blank otherwise')
@@ -127,12 +121,6 @@ Possible flags: # declared in _nn/config.py_
 '--use_log_act',
     type=str2bool,
     help='use the logarithmic activation functions in the first conv layer')
-'--add_noise',
-    type=int,
-    help='use the noise-added version from the input images (testing only)')
-'--use_ccf',
-    type=str2bool,
-    help='use the two-point cross-correlation of the input images')
 '--use_nchw',
     type=str2bool,
     help='switch gpu tensor from nhwc to nchw')

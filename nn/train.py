@@ -5,7 +5,7 @@ from __future__ import print_function
 import nn
 import tensorflow as tf
 from tensorflow.python.client import device_lib
-from numpy import min, max, exp, pi, divide
+from numpy import min, max
 
 
 def model_fn(features, labels, mode, params):
