@@ -50,18 +50,21 @@ data_arg.add_argument(
     '--dataset',
     type=str,
     default='cxidb',
-    help='Name of the dataset. Folder in cfg.data_dir/cfg.dataset')
+    choices=['helium', 'cxidb'],
+    help='Name of the dataset. Has to be a folder -> data_dir/dataset. '
+    'Currently the datasets described in the paper are the only ones '
+    'that are supported. Feel free to add others.')
 data_arg.add_argument(
     '--fraction_mode',
     type=str2bool,
     default=False,
-    help='For testing purposes. Use smaller training datasets')
+    help='Use smaller training datasets. (testing only)')
 data_arg.add_argument(
     '--fraction',
     type=float,
     default=0.25,
     choices=[0.25, 0.5, 0.75],
-    help='For testing purposes. Use smaller training datasets')
+    help='Use smaller training datasets. (testing only)')
 data_arg.add_argument(
     '--log_dir',
     type=str,
@@ -75,8 +78,7 @@ data_arg.add_argument(
 data_arg.add_argument(
     '--load_dir',
     type=str,
-    default=
-    '/mnt/storage/airynet_out/resnet/cxidb_log_first_layer_only/cxidb_reg_0_00001_res_18_alpha_0_200000_leakiness_0_2',
+    default='',
     help='Restore the network graph from there. Leave blank otherwise')
 data_arg.add_argument(
     '--save_dir',
@@ -92,7 +94,7 @@ data_arg.add_argument(
     '--mode',
     type=str,
     default='predict',
-    choices=['train', 'predict', 'save'],
+    choices=['train', 'predict'],
     help='Which mode is currently active')
 data_arg.add_argument(
     '--batch_size',
@@ -138,7 +140,7 @@ data_arg.add_argument(
     '--num_classes',
     type=int,
     default=5,
-    help='The number classes for classification')
+    help='The number of classes for classification')
 data_arg.add_argument(
     '--num_worker',
     type=int,
@@ -186,24 +188,27 @@ train_arg.add_argument(
     '--weight_decay',
     type=float,
     default=1e-4,
-    help='The amount of weight decay')
+    help='The amount of weight decay (only if --use_weight_decay is True)')
 train_arg.add_argument(
     '--relu_leakiness',
     type=float,
     default=0.2,
     help='leakiness of relu activations. only when relu is used')
 train_arg.add_argument(
-    '--alpha',
-    type=float,
-    default=.2,
-    help='alpha value for the log activation')
-train_arg.add_argument(
-    '--beta', type=float, default=0., help='beta value for the log activation')
-train_arg.add_argument(
     '--use_log_act',
     type=str2bool,
     default=True,
     help='use the logarithmic activation functions in the first conv layer')
+train_arg.add_argument(
+    '--alpha',
+    type=float,
+    default=.2,
+    help='alpha value for the log activation (only if --use_log_act is True)')
+train_arg.add_argument(
+    '--beta',
+    type=float,
+    default=0.,
+    help='beta value for the log activation (only if --use_log_act is True)')
 train_arg.add_argument(
     '--add_noise',
     type=int,
@@ -214,7 +219,8 @@ train_arg.add_argument(
     '--use_ccf',
     type=str2bool,
     default=False,
-    help='use the two-point cross-correlation of the input images')
+    help=
+    'use the two-point cross-correlation of the input images (testing only)')
 train_arg.add_argument(
     '--use_nchw',
     type=str2bool,

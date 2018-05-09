@@ -4,13 +4,10 @@ from __future__ import print_function
 
 from glob import glob
 
-from nn import get_config
 import tensorflow as tf
 import numpy as np
 
 slim = tf.contrib.slim
-
-# cfg, _ = get_config()
 
 
 def get_queue(mode_str, cfg):
@@ -22,39 +19,7 @@ def get_queue(mode_str, cfg):
     min_after_dequeue = 5000
     capacity = min_after_dequeue + 3 * batch_size
 
-    if cfg.dataset == 'cifar10':
-        data_provider = slim.dataset_data_provider.DatasetDataProvider(
-            get_cifar_dataset(mode_str, cfg),
-            num_readers=num_worker,
-            shuffle=True,
-            common_queue_capacity=capacity,
-            common_queue_min=min_after_dequeue)
-
-        img_data, lbl_data = data_provider.get(['image', 'label'])
-        [img_data, lbl_data] = tf.train.shuffle_batch(
-            [img_data, lbl_data],
-            batch_size=batch_size,
-            num_threads=num_worker,
-            capacity=capacity,
-            min_after_dequeue=min_after_dequeue,
-            name='input_data')
-
-        img_data = tf.to_float(img_data)
-        img_data = tf.image.resize_image_with_crop_or_pad(
-            img_data, cfg.target_height, cfg.target_width)
-        if mode_str == 'train':
-            img_data = augment_data(img_data)
-
-        img_data = tf.map_fn(
-            lambda img: tf.image.per_image_standardization(img), img_data)
-        labels = tf.reshape(tf.to_int32(lbl_data), [batch_size, 1])
-        indices = tf.reshape(tf.range(0, batch_size, 1), [batch_size, 1])
-        labels = tf.sparse_to_dense(
-            tf.concat([indices, labels], axis=1, name='sparse_to_dense_cat'),
-            [batch_size, cfg.num_classes], 1.0, 0.0)
-
-        return img_data, labels
-    elif cfg.dataset == 'helium' or cfg.dataset == 'cxidb':
+    if cfg.dataset == 'helium' or cfg.dataset == 'cxidb':
         img, lbl = get_dataset(mode_str, cfg)
         if not cfg.use_log_act:
             img = tf.image.convert_image_dtype(img, tf.float32)
@@ -78,6 +43,7 @@ def get_queue(mode_str, cfg):
         if cfg.ori_depth == 1 and cfg.target_depth == 3:
             img_data = tf.image.grayscale_to_rgb(img_data)
 
+        # Crop the image so that is has 2^x dimensions
         crop_height = np.power(2, np.floor(np.log2(cfg.ori_height)))
         crop_width = np.power(2, np.floor(np.log2(cfg.ori_width)))
         img_data = tf.image.resize_image_with_crop_or_pad(
@@ -86,12 +52,19 @@ def get_queue(mode_str, cfg):
             [int(cfg.target_height),
              int(cfg.target_width)], dtype=tf.int32)
         img_data = tf.image.resize_images(img_data, new_interp_size)
+
         if mode_str == 'train':
             img_data = augment_data(img_data)
         elif mode_str == 'predict' and cfg.dataset == 'helium':
+            # if predicting and using the helium dataset
+            # the 'labels' field is is filled with the unique
+            # bunchID of the image.
             labels = tf.reshape(tf.to_int32(lbl_data), [batch_size, 1])
             return {'imgs': img_data, 'lbl': labels}
         elif mode_str == 'predict' and cfg.dataset == 'cxidb':
+            # if predicting and using the cxidb dataset
+            # the 'labels' field is is filled with the unique
+            # bunchID of the image.
             labels = tf.reshape(
                 tf.argmax(lbl_data, axis=-1, output_type=tf.int32),
                 [batch_size, 1])
@@ -101,6 +74,7 @@ def get_queue(mode_str, cfg):
             tf.to_int32(lbl_data), [batch_size, cfg.num_classes])
         return img_data, labels
     else:
+        print('Currently --datasets has to be: \'helium\', \'cxidb\'')
         return None, None
 
 
@@ -167,12 +141,11 @@ def get_dataset(mode_str, cfg):
     if mode_str == 'train' or mode_str == 'eval':
         lbl_data = tf.decode_raw(features['image/class/label'], tf.int16)
         lbl_data.set_shape([cfg.num_classes])
-    elif mode_str == 'predict' and (cfg.dataset == 'helium'
-                                    or cfg.dataset == 'cxidb'):
+    elif mode_str == 'predict':
         if cfg.dataset == 'helium':
             lbl_data = tf.decode_raw(features['image/class/label'], tf.int32)
             lbl_data.set_shape([1])
-        else:
+        elif cfg.dataset == 'cxidb':
             lbl_data = tf.decode_raw(features['image/class/label'], tf.int16)
             lbl_data.set_shape([cfg.num_classes])
 

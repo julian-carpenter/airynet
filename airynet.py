@@ -111,14 +111,8 @@ def main(cfg):
                 save(
                     os.path.join(os.path.curdir, 'predictions',
                                  '{}.npy'.format(cfg.dataset)), out_dict)
-        elif cfg.mode == 'save':
-            # Use the trained network to predict
-            # path_to_saved_model = airynet_classifier.export_savedmodel(
-            #     export_dir_base=cfg.save_dir,
-            #     serving_input_receiver_fn=nn.get_queue(
-            #         'serve'))  # not functional yet
-            # print(path_to_saved_model)
-            print('Not yet implemented')
+        else:
+            print('\'mode\' has to be either \'train\' or \'predict\'')
 
 
 if __name__ == '__main__':
