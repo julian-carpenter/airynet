@@ -2,7 +2,9 @@
 
 ## Description
 
-This is the code for an upcoming paper. Not yet released.
+Code for an upcoming paper; "Using deep neural nets for classification of diffraction images", Zimmermann
+
+Not yet released.
 
 
 ## Abstract
