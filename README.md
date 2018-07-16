@@ -2,8 +2,9 @@
 
 ## Description
 
-Code for an upcoming paper; "Using deep neural nets for classification of diffraction images", Zimmermann
-Not yet released and not yet ready for deployment.
+Code for an upcoming paper; "Using deep neural nets for classification of diffraction images", Zimmermann.
+
+**Not yet released and not yet ready for deployment.**
 
 
 ## Abstract
