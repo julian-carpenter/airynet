@@ -9,33 +9,31 @@ from numpy import min, max
 
 
 def model_fn(features, labels, mode, params):
-    '''
-    Model function for airynet
-    '''
+    """Model function for airynet network"""
 
-    def select_architecture(arc='resnet'):
-        if arc == 'resnet':
+    def select_architecture(arc="resnet"):
+        if arc == "resnet":
             model_fn = nn.airynet_resnet_variant(
                 cfg.resnet_size, cfg.num_classes, cfg.data_format,
                 cfg.relu_leakiness)
-        elif arc == 'vgg':
+        elif arc == "vgg":
             model_fn = nn.airynet_vgg_variant(cfg.vgg_size, cfg.num_classes,
                                               cfg.data_format)
-        elif arc == 'alexnet':
+        elif arc == "alexnet":
             model_fn = nn.airynet_alexnet_variant(cfg.num_classes,
                                                   cfg.data_format)
         return model_fn
 
     if mode == tf.estimator.ModeKeys.PREDICT:
-        labels = features['lbl']
-        features = features['imgs']
-        labels = tf.identity(labels, name='bids')
-        features = tf.identity(features, name='images')
+        labels = features["lbl"]
+        features = features["imgs"]
+        labels = tf.identity(labels, name="bids")
+        features = tf.identity(features, name="images")
 
     feat_converted = tf.map_fn(
         lambda x: tf.image.convert_image_dtype(x, tf.float32), features)
-    tf.summary.image('images', feat_converted, max_outputs=3)
-    cfg = params['config']
+    tf.summary.image("images", feat_converted, max_outputs=3)
+    cfg = params["config"]
 
     if mode == tf.estimator.ModeKeys.TRAIN:
         global_step = tf.train.get_or_create_global_step()
@@ -53,8 +51,8 @@ def model_fn(features, labels, mode, params):
             tf.cast(global_step, tf.int32), boundaries, values)
 
         # Create a tensor named learning_rate for logging purposes
-        tf.identity(learning_rate, name='learning_rate')
-        tf.summary.scalar('learning_rate', learning_rate)
+        tf.identity(learning_rate, name="learning_rate")
+        tf.summary.scalar("learning_rate", learning_rate)
 
         optimizer = tf.train.MomentumOptimizer(
             learning_rate=learning_rate, momentum=cfg.gamma, use_nesterov=True)
@@ -68,7 +66,7 @@ def model_fn(features, labels, mode, params):
               cfg.relu_leakiness)
         network = select_architecture(cfg.airynet_type)
         for dev in avail_gpus:
-            print('Building inference on: {}'.format(dev))
+            print("Building inference on: {}".format(dev))
 
             if int(dev[-1]) != 0:
                 # set scope to reuse if more than one gpu are available
@@ -76,11 +74,11 @@ def model_fn(features, labels, mode, params):
                 reuse = True
 
             with tf.device(dev), tf.name_scope(
-                    dev.replace(':', '_').replace('/', '')):
+                    dev.replace(":", "_").replace("/", "")):
                 logits = network(features, mode == tf.estimator.ModeKeys.TRAIN,
                                  reuse)
                 if mode == tf.estimator.ModeKeys.TRAIN:
-                    if cfg.dataset == 'cifar10':
+                    if cfg.dataset == "cifar10":
                         cross_entropy = tf.losses.softmax_cross_entropy(
                             logits=logits, onehot_labels=labels)
                     else:
@@ -122,21 +120,21 @@ def model_fn(features, labels, mode, params):
         train_op = None
         loss = tf.constant(0.)
 
-    if cfg.dataset == 'cifar10':
+    if cfg.dataset == "cifar10":
         fc_out_activation_fun = tf.nn.softmax
-        fc_out_activation_name = 'softmax_output'
+        fc_out_activation_name = "softmax_output"
     else:
         fc_out_activation_fun = tf.nn.sigmoid
-        fc_out_activation_name = 'sigmoid_output'
+        fc_out_activation_name = "sigmoid_output"
 
     predictions = {
-        'classes':
+        "classes":
         tf.round(
             fc_out_activation_fun(
-                logits, name=fc_out_activation_name + '_classes')),
-        'probabilities':
+                logits, name=fc_out_activation_name + "_classes")),
+        "probabilities":
         fc_out_activation_fun(logits, name=fc_out_activation_name),
-        'bunchID':
+        "bunchID":
         labels
     }
     print(logits.get_shape())
@@ -146,9 +144,9 @@ def model_fn(features, labels, mode, params):
         # convolutional layer for the GradCam
         graph = tf.get_default_graph()
         conv_ = graph.get_operation_by_name(
-            'device_GPU_0/fourth_block/last_block_before_fc').outputs[0]
+            "device_GPU_0/fourth_block/last_block_before_fc").outputs[0]
         out_ = graph.get_operation_by_name(
-            'device_GPU_0/nn_out/final_dense').outputs[0]
+            "device_GPU_0/nn_out/final_dense").outputs[0]
         out_ = tf.nn.sigmoid(out_)
         out_ *= tf.round(out_)
         heat_loss_ = []
@@ -156,37 +154,37 @@ def model_fn(features, labels, mode, params):
         norm = []
         normed_grads = []
         for class_idx in range(out_.get_shape()[-1]):
-            print('Building GradCam for class: {}'.format(class_idx))
+            print("Building GradCam for class: {}".format(class_idx))
             heat_loss_.append(
                 tf.reduce_mean(
                     out_[:, class_idx],
-                    name='class_loss_{}'.format(class_idx)))
+                    name="class_loss_{}".format(class_idx)))
             curr_grad = tf.gradients(
-                heat_loss_, conv_, name='class_grads_{}'.format(class_idx))[0]
+                heat_loss_, conv_, name="class_grads_{}".format(class_idx))[0]
             grads.append(curr_grad)
             norm.append(
                 tf.sqrt(
                     tf.reduce_mean(tf.square(curr_grad)),
-                    name='class_norm_{}'.format(class_idx)))
+                    name="class_norm_{}".format(class_idx)))
             normed_grads.append(
                 tf.divide(
                     tf.convert_to_tensor(grads[class_idx]),
                     tf.convert_to_tensor(norm[class_idx]) + tf.constant(1e-5),
-                    name='normalized_grads_{}'.format(class_idx)))
+                    name="normalized_grads_{}".format(class_idx)))
         tf.identity(
-            tf.convert_to_tensor(normed_grads), name='normalized_grads')
+            tf.convert_to_tensor(normed_grads), name="normalized_grads")
         return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
 
     # Create some metrics for logging purposes
     lbl = tf.to_float(labels)
-    prediction = predictions['classes']
+    prediction = predictions["classes"]
 
     if mode == tf.estimator.ModeKeys.TRAIN:
         # Create a tensor named cross_entropy for logging purposes.
-        tf.identity(cross_entropy, name='cross_entropy')
-        tf.summary.scalar('metrics/cross_entropy', cross_entropy)
-        tf.summary.scalar('metrics/reg_penalty', reg_penalty)
-        # tf.summary.scalar('metrics/weight_decay_loss', weight_decay_loss)
+        tf.identity(cross_entropy, name="cross_entropy")
+        tf.summary.scalar("metrics/cross_entropy", cross_entropy)
+        tf.summary.scalar("metrics/reg_penalty", reg_penalty)
+        # tf.summary.scalar("metrics/weight_decay_loss", weight_decay_loss)
 
         # Calculate the confusion matrix
         confusion_matr = tf.to_float(
@@ -194,7 +192,7 @@ def model_fn(features, labels, mode, params):
                 tf.reshape(lbl, [-1]),
                 tf.reshape(prediction, [-1]),
                 num_classes=2))
-        tf.identity(confusion_matr, name='confusion_matr')
+        tf.identity(confusion_matr, name="confusion_matr")
 
         # Matthews Correlation Coefficient
         TP = confusion_matr[1][1]
@@ -203,8 +201,8 @@ def model_fn(features, labels, mode, params):
         FN = confusion_matr[1][0]
         MCC = (TP * TN - FP * FN) / (tf.sqrt(
             (TP + FP) * (TP + FN) * (TN + FP) * (TN + FN)))
-        tf.identity(MCC, name='mcc')
-        tf.summary.scalar('metrics/mcc', MCC)
+        tf.identity(MCC, name="mcc")
+        tf.summary.scalar("metrics/mcc", MCC)
 
         # Stack lbl and predictions as image for the summary
         lbl_vs_prediction = tf.multiply(tf.ones_like(lbl), 255)
@@ -217,21 +215,21 @@ def model_fn(features, labels, mode, params):
                 ],
                 axis=-1),
             axis=0)
-        tf.identity(lbl_vs_prediction, name='lbl_vs_prediction')
-        tf.summary.image('metrics/lbl_vs_prediction', lbl_vs_prediction)
+        tf.identity(lbl_vs_prediction, name="lbl_vs_prediction")
+        tf.summary.image("metrics/lbl_vs_prediction", lbl_vs_prediction)
 
         lbl_image = tf.expand_dims(tf.expand_dims(lbl, axis=-1), axis=0)
-        tf.identity(lbl_image, name='lbl_image')
-        tf.summary.image('metrics/lbl_image', lbl_image)
+        tf.identity(lbl_image, name="lbl_image")
+        tf.summary.image("metrics/lbl_image", lbl_image)
 
         prediction_image = tf.expand_dims(
             tf.expand_dims(prediction, axis=-1), axis=0)
-        tf.identity(prediction_image, name='prediction_image')
-        tf.summary.image('metrics/prediction_image', prediction_image)
+        tf.identity(prediction_image, name="prediction_image")
+        tf.summary.image("metrics/prediction_image", prediction_image)
 
     accuracy = tf.metrics.accuracy(lbl, prediction)
-    tf.identity(accuracy[1], name='train_accuracy')
-    tf.summary.scalar('metrics/train_accuracy', accuracy[1])
+    tf.identity(accuracy[1], name="train_accuracy")
+    tf.summary.scalar("metrics/train_accuracy", accuracy[1])
 
     eval_tp = tf.metrics.true_positives(lbl, prediction)
     eval_fp = tf.metrics.false_positives(lbl, prediction)
@@ -240,12 +238,12 @@ def model_fn(features, labels, mode, params):
     eval_mean_per_class = tf.metrics.mean_per_class_accuracy(
         lbl, prediction, cfg.num_classes)
     metrics = {
-        'accuracy': accuracy,
-        'mean_per_class_accuracy': eval_mean_per_class,
-        'precision': eval_precision,
-        'true_positives': eval_tp,
-        'false_positives': eval_fp,
-        'false_negatives': eval_fn
+        "accuracy": accuracy,
+        "mean_per_class_accuracy": eval_mean_per_class,
+        "precision": eval_precision,
+        "true_positives": eval_tp,
+        "false_positives": eval_fp,
+        "false_negatives": eval_fn
     }
 
     return tf.estimator.EstimatorSpec(
@@ -257,15 +255,15 @@ def model_fn(features, labels, mode, params):
 
 
 def get_available_gpus():
-    '''
-    Get a list of available GPU's
-    '''
+    """
+    Get a list of available GPU"s
+    """
     local_device_protos = device_lib.list_local_devices()
-    return [x.name for x in local_device_protos if x.device_type == 'GPU']
+    return [x.name for x in local_device_protos if x.device_type == "GPU"]
 
 
 def average_gradients(tower_grads, graph):
-    '''
+    """
     Calculate the average gradient for each shared variable across all towers.
 
     Note that this function provides a synchronization point across all towers.
@@ -277,8 +275,8 @@ def average_gradients(tower_grads, graph):
     Returns:
         List of pairs of (gradient, variable) where the gradient has been
         averaged across all towers.
-    '''
-    with graph.name_scope('averaging_gradients'):
+    """
+    with graph.name_scope("averaging_gradients"):
         average_grads = []
         for grad_and_vars in zip(*tower_grads):
             # Note that each grad_and_vars looks like the following:
@@ -288,17 +286,17 @@ def average_gradients(tower_grads, graph):
                 # Add 0 dimension to the gradients to represent the tower.
                 expanded_g = tf.expand_dims(g_idx, 0)
 
-                # Append on a 'tower' dimension which we will
+                # Append on a "tower" dimension which we will
                 # average over below.
                 grads.append(expanded_g)
 
-            # Average over the 'tower' dimension.
+            # Average over the "tower" dimension.
             grad = tf.concat(grads, 0)
             grad = tf.reduce_mean(grad, 0)
 
             # Keep in mind that the Variables are redundant because they are
             # shared across towers. So .. we will just return the first
-            # tower's pointer to the Variable.
+            # tower"s pointer to the Variable.
             vals = grad_and_vars[0][1]
             grad_and_var = (grad, vals)
             average_grads.append(grad_and_var)
@@ -312,11 +310,11 @@ def rescale(vals, new_min, new_max):
 
     # range check
     if old_min == old_max:
-        print('Warning: Zero input range')
+        print("Warning: Zero input range")
         return vals
 
     if new_min == new_max:
-        print('Warning: Zero output range')
+        print("Warning: Zero output range")
         return vals
 
     portion = (vals - old_min) * (new_max - new_min) / (old_max - old_min)

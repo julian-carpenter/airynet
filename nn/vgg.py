@@ -1,4 +1,4 @@
-'''
+"""
 Contains model definitions for versions of the Oxford VGG network.
 
 These model definitions were introduced in the following technical report:
@@ -12,7 +12,7 @@ These model definitions were introduced in the following technical report:
 
 More information can be obtained from the VGG website:
 www.robots.ox.ac.uk/~vgg/research/very_deep/
-'''
+"""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -29,7 +29,7 @@ def log_act_helper(x):
 
 
 def vgg_arg_scope(weight_decay=1e-6):
-    '''
+    """
     Defines the VGG arg scope.
 
     Args:
@@ -37,13 +37,13 @@ def vgg_arg_scope(weight_decay=1e-6):
 
     Returns:
     An arg_scope.
-    '''
+    """
     with slim.arg_scope(
         [slim.conv2d, slim.fully_connected],
             activation_fn=tf.nn.relu,
             weights_regularizer=slim.l2_regularizer(weight_decay),
             biases_initializer=tf.zeros_initializer()):
-        with slim.arg_scope([slim.conv2d], padding='SAME') as arg_sc:
+        with slim.arg_scope([slim.conv2d], padding="SAME") as arg_sc:
             return arg_sc
 
 
@@ -52,14 +52,14 @@ def conv_act(inputs,
              kernel_size=1,
              strides=1,
              leakiness=.1,
-             data_format='channels_last',
+             data_format="channels_last",
              reuse=False,
              is_training=True,
-             name='',
-             scope=''):
-    '''
+             name="",
+             scope=""):
+    """
     Use global custom conv+activation function
-    '''
+    """
     net = conv2d_fixed_padding(
         inputs=inputs,
         filters=filters,
@@ -82,12 +82,12 @@ def vgg_16(inputs,
            is_training=True,
            dropout_keep_prob=0.5,
            spatial_squeeze=True,
-           scope='vgg_16',
-           fc_conv_padding='VALID',
+           scope="vgg_16",
+           fc_conv_padding="VALID",
            global_pool=True,
            data_format=None,
            reuse=False):
-    '''
+    """
     Oxford Net VGG 16-Layers version D Example.
 
     Note: All the fully_connected layers have been transformed to
@@ -104,11 +104,11 @@ def vgg_16(inputs,
     the outputs. Useful to remove unnecessary dimensions for classification.
     scope: Optional scope for the variables.
     fc_conv_padding: the type of padding to use for the fully connected layer
-      that is implemented as a convolutional layer. Use 'SAME' padding if you
+      that is implemented as a convolutional layer. Use "SAME" padding if you
       are applying the network in a fully convolutional manner and want to
       get a prediction map downsampled by a factor of 32 as an output.
       Otherwise, the output prediction map will be (input / 32) - 6 in case of
-      'VALID' padding.
+      "VALID" padding.
     global_pool: Optional boolean flag. If True, the input to the
     classification layer is avgpooled to size 1x1, for any input size.
     (This is not part of the original VGG architecture.)
@@ -117,28 +117,28 @@ def vgg_16(inputs,
     net: the output of the logits layer (if num_classes is a non-zero integer),
       or the input to the logits layer (if num_classes is 0 or None).
     end_points: a dict of tensors with intermediate activations.
-    '''
-    if data_format == 'channels_first':
+    """
+    if data_format == "channels_first":
         # Convert from channels_last (channels_last) to
         # channels_first (channels_first).
         # This provides a large performance boost on GPU.
         inp_shape = inputs.get_shape()
         inputs = tf.transpose(inputs, [0, 3, 1, 2])
-        print('Transpose the inputs to channels_first, from: {} to: {}'.format(
+        print("Transpose the inputs to channels_first, from: {} to: {}".format(
             inp_shape, inputs.get_shape()))
-        print('_____________')
-        dat_form_old = 'NCHW'
+        print("_____________")
+        dat_form_old = "NCHW"
         pool_ = [1, 1, 2, 2]
         global_pool_idx = [2, 3]
     else:
-        dat_form_old = 'NHWC'
+        dat_form_old = "NHWC"
         pool_ = [1, 2, 2, 1]
         global_pool_idx = [1, 2]
     cfg.counter = 0
 
-    with tf.variable_scope(scope, 'vgg_16', [inputs]):
+    with tf.variable_scope(scope, "vgg_16", [inputs]):
         # Collect outputs for conv2d, fully_connected and max_pool2d.
-        print('Input Shape: {}'.format(inputs.get_shape()))
+        print("Input Shape: {}".format(inputs.get_shape()))
         net = tf.contrib.layers.repeat(
             inputs,
             2,
@@ -146,12 +146,12 @@ def vgg_16(inputs,
             64,
             3,
             reuse=reuse,
-            name='conv1',
+            name="conv1",
             data_format=data_format)
-        print('First conv block: {}'.format(net.get_shape()))
+        print("First conv block: {}".format(net.get_shape()))
         net = tf.nn.max_pool(
-            net, pool_, pool_, 'VALID', name='pool1', data_format=dat_form_old)
-        print('After Max-Pooling: {}'.format(net.get_shape()))
+            net, pool_, pool_, "VALID", name="pool1", data_format=dat_form_old)
+        print("After Max-Pooling: {}".format(net.get_shape()))
         net = tf.contrib.layers.repeat(
             net,
             2,
@@ -159,12 +159,12 @@ def vgg_16(inputs,
             128,
             3,
             reuse=reuse,
-            name='conv2',
+            name="conv2",
             data_format=data_format)
-        print('Second conv block: {}'.format(net.get_shape()))
+        print("Second conv block: {}".format(net.get_shape()))
         net = tf.nn.max_pool(
-            net, pool_, pool_, 'VALID', name='pool2', data_format=dat_form_old)
-        print('Max-Pooling: {}'.format(net.get_shape()))
+            net, pool_, pool_, "VALID", name="pool2", data_format=dat_form_old)
+        print("Max-Pooling: {}".format(net.get_shape()))
         net = tf.contrib.layers.repeat(
             net,
             3,
@@ -172,12 +172,12 @@ def vgg_16(inputs,
             256,
             3,
             reuse=reuse,
-            name='conv3',
+            name="conv3",
             data_format=data_format)
-        print('Third conv block: {}'.format(net.get_shape()))
+        print("Third conv block: {}".format(net.get_shape()))
         net = tf.nn.max_pool(
-            net, pool_, pool_, 'VALID', name='pool3', data_format=dat_form_old)
-        print('Max-Pooling: {}'.format(net.get_shape()))
+            net, pool_, pool_, "VALID", name="pool3", data_format=dat_form_old)
+        print("Max-Pooling: {}".format(net.get_shape()))
         net = tf.contrib.layers.repeat(
             net,
             3,
@@ -185,12 +185,12 @@ def vgg_16(inputs,
             512,
             3,
             reuse=reuse,
-            name='conv4',
+            name="conv4",
             data_format=data_format)
-        print('Fourth conv block: {}'.format(net.get_shape()))
+        print("Fourth conv block: {}".format(net.get_shape()))
         net = tf.nn.max_pool(
-            net, pool_, pool_, 'VALID', name='pool4', data_format=dat_form_old)
-        print('Max-Pooling: {}'.format(net.get_shape()))
+            net, pool_, pool_, "VALID", name="pool4", data_format=dat_form_old)
+        print("Max-Pooling: {}".format(net.get_shape()))
         net = tf.contrib.layers.repeat(
             net,
             3,
@@ -198,24 +198,24 @@ def vgg_16(inputs,
             512,
             3,
             reuse=reuse,
-            name='conv5',
+            name="conv5",
             data_format=data_format)
-        print('Fifth conv block: {}'.format(net.get_shape()))
+        print("Fifth conv block: {}".format(net.get_shape()))
         net = tf.nn.max_pool(
-            net, pool_, pool_, 'VALID', name='pool5', data_format=dat_form_old)
-        print('Max-Pooling: {}'.format(net.get_shape()))
+            net, pool_, pool_, "VALID", name="pool5", data_format=dat_form_old)
+        print("Max-Pooling: {}".format(net.get_shape()))
 
-        print('Use conv2d instead of fully_connected layers.')
-        net = conv_act(net, 4096, 7, name='fc6', reuse=reuse)
-        net = tf.nn.dropout(net, dropout_keep_prob, name='dropout6')
-        net = conv_act(net, 4096, 1, name='fc7', reuse=reuse)
-        print('Last conv block: {}'.format(net.get_shape()))
+        print("Use conv2d instead of fully_connected layers.")
+        net = conv_act(net, 4096, 7, name="fc6", reuse=reuse)
+        net = tf.nn.dropout(net, dropout_keep_prob, name="dropout6")
+        net = conv_act(net, 4096, 1, name="fc7", reuse=reuse)
+        print("Last conv block: {}".format(net.get_shape()))
 
         if global_pool:
             net = tf.reduce_mean(
-                net, global_pool_idx, keepdims=True, name='global_pool')
+                net, global_pool_idx, keepdims=True, name="global_pool")
         if num_classes:
-            net = tf.nn.dropout(net, dropout_keep_prob, name='dropout7')
+            net = tf.nn.dropout(net, dropout_keep_prob, name="dropout7")
             net = conv2d_fixed_padding(
                 net,
                 num_classes,
@@ -223,10 +223,10 @@ def vgg_16(inputs,
                 1,
                 data_format,
                 activation=None,
-                name='fc8',
+                name="fc8",
                 reuse=reuse)
             if spatial_squeeze and num_classes is not None:
-                net = tf.squeeze(net, global_pool_idx, name='fc8/squeezed')
+                net = tf.squeeze(net, global_pool_idx, name="fc8/squeezed")
 
         net.default_image_size = 224
         return net
@@ -237,12 +237,12 @@ def vgg_19(inputs,
            is_training=True,
            dropout_keep_prob=0.5,
            spatial_squeeze=True,
-           scope='vgg_19',
-           fc_conv_padding='VALID',
+           scope="vgg_19",
+           fc_conv_padding="VALID",
            global_pool=True,
            data_format=None,
            reuse=False):
-    '''
+    """
     Oxford Net VGG 19-Layers version E Example.
 
     Note: All the fully_connected layers have been transformed to
@@ -259,11 +259,11 @@ def vgg_19(inputs,
     the outputs. Useful to remove unnecessary dimensions for classification.
     scope: Optional scope for the variables.
     fc_conv_padding: the type of padding to use for the fully connected layer
-      that is implemented as a convolutional layer. Use 'SAME' padding if you
+      that is implemented as a convolutional layer. Use "SAME" padding if you
       are applying the network in a fully convolutional manner and want to
       get a prediction map downsampled by a factor of 32 as an output.
       Otherwise, the output prediction map will be (input / 32) - 6 in case of
-      'VALID' padding.
+      "VALID" padding.
     global_pool: Optional boolean flag. If True, the input to the
     classification layer is avgpooled to size 1x1, for any input size.
     (This is not part of the original VGG architecture.)
@@ -272,28 +272,28 @@ def vgg_19(inputs,
     net: the output of the logits layer (if num_classes is a non-zero integer),
       or the input to the logits layer (if num_classes is 0 or None).
     end_points: a dict of tensors with intermediate activations.
-    '''
-    if data_format == 'channels_first':
+    """
+    if data_format == "channels_first":
         # Convert from channels_last (channels_last) to
         # channels_first (channels_first).
         # This provides a large performance boost on GPU.
         inp_shape = inputs.get_shape()
         inputs = tf.transpose(inputs, [0, 3, 1, 2])
-        print('Transpose the inputs to channels_first, from: {} to: {}'.format(
+        print("Transpose the inputs to channels_first, from: {} to: {}".format(
             inp_shape, inputs.get_shape()))
-        print('_____________')
-        dat_form_old = 'NCHW'
+        print("_____________")
+        dat_form_old = "NCHW"
         pool_ = [1, 1, 2, 2]
         global_pool_idx = [2, 3]
     else:
-        dat_form_old = 'NHWC'
+        dat_form_old = "NHWC"
         pool_ = [1, 2, 2, 1]
         global_pool_idx = [1, 2]
     cfg.counter = 0
 
-    with tf.variable_scope(scope, 'vgg_19', [inputs]):
+    with tf.variable_scope(scope, "vgg_19", [inputs]):
         # Collect outputs for conv2d, fully_connected and max_pool2d.
-        print('Input Shape: {}'.format(inputs.get_shape()))
+        print("Input Shape: {}".format(inputs.get_shape()))
         net = tf.contrib.layers.repeat(
             inputs,
             2,
@@ -301,12 +301,12 @@ def vgg_19(inputs,
             64,
             3,
             reuse=reuse,
-            name='conv1',
+            name="conv1",
             data_format=data_format)
-        print('First conv block: {}'.format(net.get_shape()))
+        print("First conv block: {}".format(net.get_shape()))
         net = tf.nn.max_pool(
-            net, pool_, pool_, 'VALID', name='pool1', data_format=dat_form_old)
-        print('After Max-Pooling: {}'.format(net.get_shape()))
+            net, pool_, pool_, "VALID", name="pool1", data_format=dat_form_old)
+        print("After Max-Pooling: {}".format(net.get_shape()))
         net = tf.contrib.layers.repeat(
             net,
             2,
@@ -314,12 +314,12 @@ def vgg_19(inputs,
             128,
             3,
             reuse=reuse,
-            name='conv2',
+            name="conv2",
             data_format=data_format)
-        print('Second conv block: {}'.format(net.get_shape()))
+        print("Second conv block: {}".format(net.get_shape()))
         net = tf.nn.max_pool(
-            net, pool_, pool_, 'VALID', name='pool2', data_format=dat_form_old)
-        print('Max-Pooling: {}'.format(net.get_shape()))
+            net, pool_, pool_, "VALID", name="pool2", data_format=dat_form_old)
+        print("Max-Pooling: {}".format(net.get_shape()))
         net = tf.contrib.layers.repeat(
             net,
             4,
@@ -327,12 +327,12 @@ def vgg_19(inputs,
             256,
             3,
             reuse=reuse,
-            name='conv3',
+            name="conv3",
             data_format=data_format)
-        print('Third conv block: {}'.format(net.get_shape()))
+        print("Third conv block: {}".format(net.get_shape()))
         net = tf.nn.max_pool(
-            net, pool_, pool_, 'VALID', name='pool3', data_format=dat_form_old)
-        print('Max-Pooling: {}'.format(net.get_shape()))
+            net, pool_, pool_, "VALID", name="pool3", data_format=dat_form_old)
+        print("Max-Pooling: {}".format(net.get_shape()))
         net = tf.contrib.layers.repeat(
             net,
             4,
@@ -340,12 +340,12 @@ def vgg_19(inputs,
             512,
             3,
             reuse=reuse,
-            name='conv4',
+            name="conv4",
             data_format=data_format)
-        print('Fourth conv block: {}'.format(net.get_shape()))
+        print("Fourth conv block: {}".format(net.get_shape()))
         net = tf.nn.max_pool(
-            net, pool_, pool_, 'VALID', name='pool4', data_format=dat_form_old)
-        print('Max-Pooling: {}'.format(net.get_shape()))
+            net, pool_, pool_, "VALID", name="pool4", data_format=dat_form_old)
+        print("Max-Pooling: {}".format(net.get_shape()))
         net = tf.contrib.layers.repeat(
             net,
             3,
@@ -353,24 +353,24 @@ def vgg_19(inputs,
             512,
             3,
             reuse=reuse,
-            name='conv5',
+            name="conv5",
             data_format=data_format)
-        print('Fifth conv block: {}'.format(net.get_shape()))
+        print("Fifth conv block: {}".format(net.get_shape()))
         net = tf.nn.max_pool(
-            net, pool_, pool_, 'VALID', name='pool5', data_format=dat_form_old)
-        print('Max-Pooling: {}'.format(net.get_shape()))
+            net, pool_, pool_, "VALID", name="pool5", data_format=dat_form_old)
+        print("Max-Pooling: {}".format(net.get_shape()))
 
-        print('Use conv2d instead of fully_connected layers.')
-        net = conv_act(net, 4096, 7, name='fc6', reuse=reuse)
-        net = tf.nn.dropout(net, dropout_keep_prob, name='dropout6')
-        net = conv_act(net, 4096, 1, name='fc7', reuse=reuse)
-        print('Last conv block: {}'.format(net.get_shape()))
+        print("Use conv2d instead of fully_connected layers.")
+        net = conv_act(net, 4096, 7, name="fc6", reuse=reuse)
+        net = tf.nn.dropout(net, dropout_keep_prob, name="dropout6")
+        net = conv_act(net, 4096, 1, name="fc7", reuse=reuse)
+        print("Last conv block: {}".format(net.get_shape()))
 
         if global_pool:
             net = tf.reduce_mean(
-                net, global_pool_idx, keepdims=True, name='global_pool')
+                net, global_pool_idx, keepdims=True, name="global_pool")
         if num_classes:
-            net = tf.nn.dropout(net, dropout_keep_prob, name='dropout7')
+            net = tf.nn.dropout(net, dropout_keep_prob, name="dropout7")
             net = conv2d_fixed_padding(
                 net,
                 num_classes,
@@ -378,37 +378,37 @@ def vgg_19(inputs,
                 1,
                 data_format,
                 activation=None,
-                name='fc8',
+                name="fc8",
                 reuse=reuse)
             if spatial_squeeze and num_classes is not None:
-                net = tf.squeeze(net, global_pool_idx, name='fc8/squeezed')
+                net = tf.squeeze(net, global_pool_idx, name="fc8/squeezed")
 
         net.default_image_size = 224
         return net
 
 
 def airynet_vgg_variant_generator(layers, num_classes, data_format=None):
-    '''
+    """
     Generator for ImageNet airynet v2 models.
 
     Args:
     layers: A length-1 array denoting the number of layers in the net.
     num_classes: The number of possible classes for image classification.
-    data_format: The input format ('channels_last', 'channels_first', or None).
+    data_format: The input format ("channels_last", "channels_first", or None).
       If set to None, the format is dependent on whether a GPU is available.
 
     Returns:
     The model function that takes in `inputs`, `is_training` and `reuse` and
     returns the output tensor of the airynet model.
-    '''
+    """
     if data_format is None:
-        data_format = ('channels_first'
-                       if tf.test.is_built_with_cuda() else 'channels_last')
+        data_format = ("channels_first"
+                       if tf.test.is_built_with_cuda() else "channels_last")
 
     def model(inputs, is_training, reuse):
-        '''
+        """
         Constructs the airynet model given the inputs.
-        '''
+        """
         if layers == 16:
             return vgg_16(
                 inputs,
@@ -427,12 +427,12 @@ def airynet_vgg_variant_generator(layers, num_classes, data_format=None):
 
 
 def airynet_vgg_variant(vgg_size, num_classes, data_format=None):
-    '''
+    """
     Returns the airynet vgg model for a given size
     and number of output classes.
-    '''
+    """
     if vgg_size not in [16, 19]:
-        raise ValueError('Not a valid vgg_size:', vgg_size)
+        raise ValueError("Not a valid vgg_size:", vgg_size)
 
-    print('Building: {} layers with a {} layout'.format(vgg_size, 'VGG'))
+    print("Building: {} layers with a {} layout".format(vgg_size, "VGG"))
     return airynet_vgg_variant_generator(vgg_size, num_classes, data_format)

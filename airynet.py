@@ -1,6 +1,6 @@
-'''
-Runs a airynet model on the CIFAR-10 or the helium dataset.
-'''
+"""
+Runs a airynet model on the helium dataset.
+"""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -16,35 +16,35 @@ from numpy import save
 
 
 def get_time():
-    return datetime.now().strftime('%m%d_%H%M%S')
+    return datetime.now().strftime("%m%d_%H%M%S")
 
 
 def main(cfg):
     # Using the Winograd non-fused algorithms
     # provides a small performance boost.
-    os.environ['TF_ENABLE_WINOGRAD_NONFUSED'] = '1'
+    os.environ["TF_ENABLE_WINOGRAD_NONFUSED"] = "1"
     if os.path.isdir(cfg.out_dir_name):
         if cfg.out_dir_name == cfg.load_dir:
             model_dir = cfg.load_dir
         else:
             print(
-                'Overriding output path {} with: {} since it already existed '
-                'and was not the loading path'.format(
-                    cfg.out_dir_name, cfg.out_dir_name + '_tmp'))
-            cfg.out_dir_name = cfg.out_dir_name + '_tmp'
+                "Overriding output path {} with: {} since it already existed "
+                "and was not the loading path".format(
+                    cfg.out_dir_name, cfg.out_dir_name + "_tmp"))
+            cfg.out_dir_name = cfg.out_dir_name + "_tmp"
 
-    if cfg.mode == 'train' and not cfg.load_dir:
+    if cfg.mode == "train" and not cfg.load_dir:
         if cfg.out_dir_name:
-            model_dir = '{}/{}_{}'.format(cfg.log_dir, cfg.dataset,
+            model_dir = "{}/{}_{}".format(cfg.log_dir, cfg.dataset,
                                           cfg.out_dir_name)
         else:
-            model_dir = '{}/{}_{}'.format(cfg.log_dir, cfg.dataset, get_time())
+            model_dir = "{}/{}_{}".format(cfg.log_dir, cfg.dataset, get_time())
     else:
         model_dir = cfg.load_dir
 
-    print('Model directory: {}'.format(model_dir))
+    print("Model directory: {}".format(model_dir))
 
-    with tf.device('/cpu:0'):
+    with tf.device("/cpu:0"):
         run_config_obj = tf.contrib.learn.RunConfig(
             session_config=tf.ConfigProto(
                 allow_soft_placement=True, log_device_placement=False),
@@ -57,15 +57,14 @@ def main(cfg):
             config=run_config_obj,
             model_fn=nn.model_fn,
             model_dir=model_dir,
-            params={'config': cfg})
-
-        if cfg.mode == 'train':
+            params={"config": cfg})
+        if cfg.mode == "train":
             for _ in range(int(cfg.train_steps) // int(cfg.steps_per_eval)):
                 tensors_to_log = {
-                    'learning_rate': 'learning_rate',
-                    'cross_entropy': 'cross_entropy',
-                    'train_accuracy': 'train_accuracy',
-                    'confusion_matrix': 'confusion_matr'
+                    "learning_rate": "learning_rate",
+                    "cross_entropy": "cross_entropy",
+                    "train_accuracy": "train_accuracy",
+                    "confusion_matrix": "confusion_matr"
                 }
                 print(cfg.l1_regularization_scale, cfg.l2_regularization_scale,
                       cfg.resnet_size, cfg.alpha, cfg.relu_leakiness,
@@ -74,53 +73,53 @@ def main(cfg):
                     tensors=tensors_to_log, every_n_iter=cfg.log_step)
 
                 airynet_classifier.train(
-                    input_fn=lambda: nn.get_queue('train', cfg),
+                    input_fn=lambda: nn.get_queue("train", cfg),
                     steps=cfg.steps_per_eval,
                     hooks=[logging_hook])
 
                 # Evaluate the model and print results
                 eval_results = airynet_classifier.evaluate(
-                    input_fn=lambda: nn.get_queue('eval', cfg), steps=100)
+                    input_fn=lambda: nn.get_queue("eval", cfg), steps=100)
                 print(eval_results)
-        elif cfg.mode == 'predict':
+        elif cfg.mode == "predict":
             # Use the trained network to predict
             predict_results = airynet_classifier.predict(
-                input_fn=lambda: nn.get_queue('predict', cfg),
+                input_fn=lambda: nn.get_queue("predict", cfg),
                 hooks=[nn.PredictionHook()])
             with open(
-                    os.path.join(os.path.curdir, 'predictions',
-                                 '{}.txt'.format(cfg.dataset)),
-                    'w') as text_file:
-                print('Bunch_ID:\tClasses:\tProbabilities:', file=text_file)
+                    os.path.join(os.path.curdir, "predictions",
+                                 "{}.txt".format(cfg.dataset)),
+                    "w") as text_file:
+                print("Bunch_ID:\tClasses:\tProbabilities:", file=text_file)
                 out_dict = {}
                 for idx, shot in tqdm(enumerate(predict_results)):
                     out_dict.update({
-                        'shot_{:05d}'.format(idx + 1): [
-                            shot['bunchID'], shot['classes'],
-                            shot['probabilities']
+                        "shot_{:05d}".format(idx + 1): [
+                            shot["bunchID"], shot["classes"],
+                            shot["probabilities"]
                         ]
                     })
-                    out_str = ('{}\t{}\t{}'.format(
-                        shot['bunchID'],
-                        ['{}'.format(int(k)) for k in shot['classes']],
-                        ['{:.04f}'.format(k)
-                         for k in shot['probabilities']])).replace('\'', '')
+                    out_str = ("{}\t{}\t{}".format(
+                        shot["bunchID"],
+                        ["{}".format(int(k)) for k in shot["classes"]],
+                        ["{:.04f}".format(k)
+                         for k in shot["probabilities"]])).replace("\"", "")
                     print(
-                        out_str.replace('[', '').replace(']', ''),
+                        out_str.replace("[", "").replace("]", ""),
                         file=text_file)
                 save(
-                    os.path.join(os.path.curdir, 'predictions',
-                                 '{}.npy'.format(cfg.dataset)), out_dict)
+                    os.path.join(os.path.curdir, "predictions",
+                                 "{}.npy".format(cfg.dataset)), out_dict)
         else:
-            print('\'mode\' has to be either \'train\' or \'predict\'')
+            print("\"mode\" has to be either \"train\" or \"predict\"")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     cfg, _ = nn.get_config()
-    if cfg.log_level == 'WARN':
+    if cfg.log_level == "WARN":
         verbosity = tf.logging.WARN
-    elif cfg.log_level == 'DEBUG':
+    elif cfg.log_level == "DEBUG":
         verbosity = tf.logging.DEBUG
     else:
         verbosity = tf.logging.INFO

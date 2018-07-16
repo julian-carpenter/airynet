@@ -2,7 +2,7 @@
 
 ## Description
 
-This is the code for the paper _Using deep neural nets for classification of diffraction images_, Zimmermann et al. 2018, doi: 000
+This is the code for an upcoming paper. Not yet released.
 
 
 ## Abstract
@@ -24,117 +24,117 @@ python airynet.py ––flags=value
 Possible flags: # declared in _nn/config.py_
 
 # Network
-'--resnet_size',
+"--resnet_size",
     type=int,
-    help='The size of the resnet model to use. Only applicable to resnet')
-'--vgg_size',
+    help="The size of the resnet model to use. Only applicable to resnet")
+"--vgg_size",
     type=int,
-    help='The size of the vgg model to use. Only applicable to vgg')
-'--airynet_type',
+    help="The size of the vgg model to use. Only applicable to vgg")
+"--airynet_type",
     type=str,
-    help='The architecture that is used')
+    help="The architecture that is used")
 
 # Data
-'--data_dir',
+"--data_dir",
     type=str,
-    help='This path is a prefix for the dataset flag.')
-'--dataset',
+    help="This path is a prefix for the dataset flag.")
+"--dataset",
     type=str,
-    help='Name of the dataset. Folder in cfg.data_dir/cfg.dataset')
-'--log_dir',
+    help="Name of the dataset. Folder in cfg.data_dir/cfg.dataset")
+"--log_dir",
     type=str,
-    help='The directory where the model will be stored.')
-'--load_dir',
+    help="The directory where the model will be stored.")
+"--load_dir",
     type=str,
-    help='Restore the network graph from there. Leave blank otherwise')
-'--save_dir',
+    help="Restore the network graph from there. Leave blank otherwise")
+"--save_dir",
     type=str,
-    help='The network graph will be saved to this directory. When mode=save')
-'--out_dir_name',
+    help="The network graph will be saved to this directory. When mode=save")
+"--out_dir_name",
     type=str,
-    help='If provided this tag is used as output folder name for the model')
-'--mode',
+    help="If provided this tag is used as output folder name for the model")
+"--mode",
     type=str,
-    help='Which mode is currently active')
-'--batch_size',
+    help="Which mode is currently active")
+"--batch_size",
     type=int,
-    help='The number of images per batch.')
-'--dataset_size',
+    help="The number of images per batch.")
+"--dataset_size",
     type=int,
-    help='The number of images in the dataset')
-'--ori_width',
+    help="The number of images in the dataset")
+"--ori_width",
     type=int,
-    help='Original width of the input images')
-'--ori_height',
+    help="Original width of the input images")
+"--ori_height",
     type=int,
-    help='Original height of the input images')
-'--ori_depth',
+    help="Original height of the input images")
+"--ori_depth",
     type=int,
-    help='Original depth (channels) of the input images')
-'--target_width',
+    help="Original depth (channels) of the input images")
+"--target_width",
     type=int,
-    help='Target width of the input images')
-'--target_height',
+    help="Target width of the input images")
+"--target_height",
     type=int,
-    help='Target height of the input images')
-'--target_depth',
+    help="Target height of the input images")
+"--target_depth",
     type=int,
-    help='Target depth (channels) of the input images')
-'--num_classes',
+    help="Target depth (channels) of the input images")
+"--num_classes",
     type=int,
-    help='The number classes for classification')
-'--num_worker',
+    help="The number classes for classification")
+"--num_worker",
     type=int,
-    help='Number of simultaneous threads that read in data')
+    help="Number of simultaneous threads that read in data")
 
 # Training
-'--train_steps',
+"--train_steps",
     type=int,
-    help='The number of batches to train.')
-'--steps_per_eval',
+    help="The number of batches to train.")
+"--steps_per_eval",
     type=int,
-    help='The number of batches to run in between evaluations.')
-'--lr',
+    help="The number of batches to run in between evaluations.")
+"--lr",
     type=float,
-    help='lr is scaled with batch size. lr_final = lr*batch_size/128')
-'--gamma',
+    help="lr is scaled with batch size. lr_final = lr*batch_size/128")
+"--gamma",
     type=float,
-    help='The momentum (gamma) for the optimizer')
-'--l1_regularization_scale',
+    help="The momentum (gamma) for the optimizer")
+"--l1_regularization_scale",
     type=float,
-    help='Apply l1 regularization')
-'--l2_regularization_scale',
+    help="Apply l1 regularization")
+"--l2_regularization_scale",
     type=float,
-    help='Apply l2 regularization')
-'--use_weight_decay',
+    help="Apply l2 regularization")
+"--use_weight_decay",
     type=str2bool,
-    help='Use a l2 weight decay loss')
-'--weight_decay',
+    help="Use a l2 weight decay loss")
+"--weight_decay",
     type=float,
-    help='The amount of weight decay')
-'--relu_leakiness',
+    help="The amount of weight decay")
+"--relu_leakiness",
     type=float,
-    help='leakiness of relu activations. only when relu is used')
-'--alpha',
+    help="leakiness of relu activations. only when relu is used")
+"--alpha",
     type=float,
-    help='alpha value for the log activation')
-'--use_log_act',
+    help="alpha value for the log activation")
+"--use_log_act",
     type=str2bool,
-    help='use the logarithmic activation functions in the first conv layer')
-'--use_nchw',
+    help="use the logarithmic activation functions in the first conv layer")
+"--use_nchw",
     type=str2bool,
-    help='switch gpu tensor from nhwc to nchw')
+    help="switch gpu tensor from nhwc to nchw")
 
 # Misc.
-'--log_level',
+"--log_level",
     type=str,
-    help='The log level for tensorflow')
-'--log_step',
+    help="The log level for tensorflow")
+"--log_step",
     type=int,
-    help='Save a chkpnt every log_step steps')
-'--random_seed',
+    help="Save a chkpnt every log_step steps")
+"--random_seed",
     type=int,
-    help='Use the same random seed for reproducibility')
+    help="Use the same random seed for reproducibility")
 
 
 ```
