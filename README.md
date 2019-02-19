@@ -2,17 +2,15 @@
 
 ## Description
 
-Code for an upcoming paper; "Using deep neural nets for classification of diffraction images", Zimmermann.
+Code for an upcoming paper; "Using deep neural networks for
+classifying complex features in diffraction images", Zimmermann et al..
 
 **Not yet released and not yet ready for deployment.**
 
 
 ## Abstract
 
-Intense short-wavelength pulses from Free-Electron-Lasers and high-harmonic-generation sources enable diffractive imaging of individual nano-sized objects with a single x-ray laser shot. Due to the high repetition rates, large data sets with up to several million diffraction patterns are typically obtained in Free-Electron-Laser particle diffraction experiments, representing a severe problem for data analysis. Assuming a dataset of K diffraction patterns with M x N pixels, a high dimensional space (K x M x N) has to be analyzed. Thus feature selection is crucial as it reduces the dimensionality. Usually, custom-made algorithms are written to approximate these features with the downside that they do not generalize well.
-Examples are feature extraction methods applicable to spherically shaped patterns but not to arbitrary shapes. In this work, we exploit the possibility to utilize a deep neural network as a feature extractor. We benchmark two widely used deep neural network architectures, a residual
-convolutional deep neural network - called ResNet and a classical convolutional neural network - called VGG -, both trained in a supervised manner utilizing a small training set of manually labeled
-data. Furthermore, we show that the classification accuracy of these models increases by implementing a novel activation function, which takes the intrinsic scaling of diffraction patterns into account. Also, we propose an approach to be more robust to highly noisy data using two-point cross-correlation maps. The approaches are tested and benchmarked on two large datasets. The first dataset is from a wide-angle X-ray scattering experiment on Helium nanodroplets, conducted at the LDM endstation of the FERMI free-electron laser in Trieste, and the second dataset is from a small-angle X-ray scattering dataset from the CXI-database. Our results show that deep convolutional neural networks outperform previous attempts for sorting and classifying complex diffraction pattern.
+Intense short-wavelength pulses from free-electron lasers and high-harmonic-generation sources enable diffractive imaging of individual nano-sized objects with a single x-ray laser shot. The enormous data sets with up to several million diffraction patterns represent a severe problem for data analysis, due to the high dimensionality of imaging data. Feature recognition and selection is a crucial step to reduce the dimensionality. Usually, custom-made algorithms are developed at a considerable effort to approximate the particular features connected to an individual specimen, but facing different experimental conditions, these approaches do not generalize well. On the other hand, deep neural networks are the principal instrument for today's revolution in automated image recognition, a development that has not been adapted to its full potential for data analysis in science. We recently published in \citet{Langbehn2018} the first application of a deep neural network as a feature extractor for wide-angle diffraction images of helium nanodroplets. Here we present the setup, our modifications and the training process of the deep neural network for diffraction image classification and its systematic benchmarking. We find that deep neural networks significantly outperform previous attempts for sorting and classifying complex diffraction patterns and are a significant improvement for the much-needed assistance during post-processing of large amounts of experimental coherent diffraction imaging data.
 
 ## Requirements
 * Python 3.6+ (Mainly because of the _print("...{}...".format(...)))_ statements)
