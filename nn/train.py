@@ -20,9 +20,6 @@ def model_fn(features, labels, mode, params):
         elif arc == "vgg":
             model_fn = nn.airynet_vgg_variant(cfg.vgg_size, cfg.num_classes,
                                               cfg.data_format)
-        elif arc == "alexnet":
-            model_fn = nn.airynet_alexnet_variant(cfg.num_classes,
-                                                  cfg.data_format)
         return model_fn
 
     if mode == tf.estimator.ModeKeys.PREDICT:
