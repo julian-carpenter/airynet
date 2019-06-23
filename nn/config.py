@@ -37,30 +37,27 @@ net_arg.add_argument(
     default=16,
     choices=[16, 19],
     help="The size of the vgg model to use. Only applicable to vgg")
-net_arg.add_argument(
-    "--airynet_type",
-    type=str,
-    default="resnet",
-    choices=["resnet", "vgg"],
-    help="The architecture that is used")
+net_arg.add_argument("--airynet_type",
+                     type=str,
+                     default="resnet",
+                     choices=["resnet", "vgg"],
+                     help="The architecture that is used")
 
 # Data
 data_arg = add_argument_group("Data")
-data_arg.add_argument(
-    "--data_dir",
-    type=str,
-    default="../datasets/",
-    help="This path is a prefix for the dataset flag.")
+data_arg.add_argument("--data_dir",
+                      type=str,
+                      default="../datasets/",
+                      help="This path is a prefix for the dataset flag.")
 data_arg.add_argument(
     "--dataset",
     type=str,
-    default="cxidb",
+    default="helium",
     help="Name of the dataset. Has to be a folder -> data_dir/dataset")
-data_arg.add_argument(
-    "--log_dir",
-    type=str,
-    default="logs",
-    help="The directory where the model will be stored.")
+data_arg.add_argument("--log_dir",
+                      type=str,
+                      default="logs",
+                      help="The directory where the model will be stored.")
 data_arg.add_argument(
     "--load_dir",
     type=str,
@@ -76,70 +73,58 @@ data_arg.add_argument(
     type=str,
     default="",
     help="If provided this tag is used as output folder name for the model")
-data_arg.add_argument(
-    "--mode",
-    type=str,
-    default="predict",
-    choices=["train", "predict"],
-    help="Which mode is currently active")
-data_arg.add_argument(
-    "--batch_size",
-    type=int,
-    default=24,
-    help="The number of images per batch.")
-data_arg.add_argument(
-    "--dataset_size",
-    type=int,
-    default=7264,
-    help="The number of images in the dataset")
-data_arg.add_argument(
-    "--ori_width",
-    type=int,
-    default=259,
-    help="Original width of the input images")
-data_arg.add_argument(
-    "--ori_height",
-    type=int,
-    default=259,
-    help="Original height of the input images")
-data_arg.add_argument(
-    "--ori_depth",
-    type=int,
-    default=1,
-    help="Original depth (channels) of the input images")
-data_arg.add_argument(
-    "--target_width",
-    type=int,
-    default=224,
-    help="Target width of the input images")
-data_arg.add_argument(
-    "--target_height",
-    type=int,
-    default=224,
-    help="Target height of the input images")
-data_arg.add_argument(
-    "--target_depth",
-    type=int,
-    default=1,
-    help="Target depth (channels) of the input images")
-data_arg.add_argument(
-    "--num_classes",
-    type=int,
-    default=5,
-    help="The number of classes for classification")
-data_arg.add_argument(
-    "--num_worker",
-    type=int,
-    default=4,
-    help="Number of simultaneous threads that read in data")
+data_arg.add_argument("--mode",
+                      type=str,
+                      default="train",
+                      choices=["train", "predict"],
+                      help="Which mode is currently active")
+data_arg.add_argument("--batch_size",
+                      type=int,
+                      default=24,
+                      help="The number of images per batch.")
+data_arg.add_argument("--dataset_size",
+                      type=int,
+                      default=7264,
+                      help="The number of images in the dataset")
+data_arg.add_argument("--ori_width",
+                      type=int,
+                      default=259,
+                      help="Original width of the input images")
+data_arg.add_argument("--ori_height",
+                      type=int,
+                      default=259,
+                      help="Original height of the input images")
+data_arg.add_argument("--ori_depth",
+                      type=int,
+                      default=1,
+                      help="Original depth (channels) of the input images")
+data_arg.add_argument("--target_width",
+                      type=int,
+                      default=224,
+                      help="Target width of the input images")
+data_arg.add_argument("--target_height",
+                      type=int,
+                      default=224,
+                      help="Target height of the input images")
+data_arg.add_argument("--target_depth",
+                      type=int,
+                      default=1,
+                      help="Target depth (channels) of the input images")
+data_arg.add_argument("--num_classes",
+                      type=int,
+                      default=11,
+                      help="The number of classes for classification")
+data_arg.add_argument("--num_worker",
+                      type=int,
+                      default=4,
+                      help="Number of simultaneous threads that read in data")
 
 # Training / test parameters
 train_arg = add_argument_group("Training")
-train_arg.add_argument(
-    "--train_steps",
-    type=int,
-    default=3e4,
-    help="The number of batches to train.")
+train_arg.add_argument("--train_steps",
+                       type=int,
+                       default=3e4,
+                       help="The number of batches to train.")
 train_arg.add_argument(
     "--steps_per_eval",
     type=int,
@@ -150,26 +135,22 @@ train_arg.add_argument(
     type=float,
     default=.1,  # .1 vgg
     help="lr is scaled with batch size. lr_final = lr*batch_size/128")
-train_arg.add_argument(
-    "--gamma",
-    type=float,
-    default=0.9,
-    help="The momentum (gamma) for the optimizer")
-train_arg.add_argument(
-    "--l1_regularization_scale",
-    type=float,
-    default=1e-5,
-    help="Apply l1 regularization")
-train_arg.add_argument(
-    "--l2_regularization_scale",
-    type=float,
-    default=1e-5,
-    help="Apply l2 regularization")
-train_arg.add_argument(
-    "--use_weight_decay",
-    type=str2bool,
-    default=False,
-    help="Use a l2 weight decay loss")
+train_arg.add_argument("--gamma",
+                       type=float,
+                       default=0.9,
+                       help="The momentum (gamma) for the optimizer")
+train_arg.add_argument("--l1_regularization_scale",
+                       type=float,
+                       default=1e-5,
+                       help="Apply l1 regularization")
+train_arg.add_argument("--l2_regularization_scale",
+                       type=float,
+                       default=1e-5,
+                       help="Apply l2 regularization")
+train_arg.add_argument("--use_weight_decay",
+                       type=str2bool,
+                       default=False,
+                       help="Use a l2 weight decay loss")
 train_arg.add_argument(
     "--weight_decay",
     type=float,
@@ -195,30 +176,26 @@ train_arg.add_argument(
     type=float,
     default=0.,
     help="beta value for the log activation (only if --use_log_act is True)")
-train_arg.add_argument(
-    "--use_nchw",
-    type=str2bool,
-    default=True,
-    help="switch gpu tensor from nhwc to nchw")
+train_arg.add_argument("--use_nchw",
+                       type=str2bool,
+                       default=True,
+                       help="switch gpu tensor from nhwc to nchw")
 
 # Misc
 misc_arg = add_argument_group("Misc")
-misc_arg.add_argument(
-    "--log_level",
-    type=str,
-    default="INFO",
-    choices=["INFO", "DEBUG", "WARN"],
-    help="The log level for tensorflow")
-misc_arg.add_argument(
-    "--log_step",
-    type=int,
-    default=100,
-    help="Save a chkpnt every log_step steps")
-misc_arg.add_argument(
-    "--random_seed",
-    type=int,
-    default=1612,
-    help="Use the same random seed for reproducibility")
+misc_arg.add_argument("--log_level",
+                      type=str,
+                      default="INFO",
+                      choices=["INFO", "DEBUG", "WARN"],
+                      help="The log level for tensorflow")
+misc_arg.add_argument("--log_step",
+                      type=int,
+                      default=100,
+                      help="Save a chkpnt every log_step steps")
+misc_arg.add_argument("--random_seed",
+                      type=int,
+                      default=1612,
+                      help="Use the same random seed for reproducibility")
 
 
 def get_config():

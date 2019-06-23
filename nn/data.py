@@ -25,20 +25,19 @@ def get_queue(mode_str, cfg):
             img = tf.image.convert_image_dtype(img, tf.float32)
 
         if mode_str == "predict":
-            [img_data, lbl_data] = tf.train.batch(
-                [img, lbl],
-                batch_size=batch_size,
-                num_threads=1,
-                capacity=capacity,
-                name="input_data")
+            [img_data, lbl_data] = tf.train.batch([img, lbl],
+                                                  batch_size=batch_size,
+                                                  num_threads=1,
+                                                  capacity=capacity,
+                                                  name="input_data")
         else:
-            [img_data, lbl_data] = tf.train.shuffle_batch(
-                [img, lbl],
-                batch_size=batch_size,
-                num_threads=num_worker,
-                capacity=capacity,
-                min_after_dequeue=min_after_dequeue,
-                name="input_data")
+            [img_data, lbl_data
+             ] = tf.train.shuffle_batch([img, lbl],
+                                        batch_size=batch_size,
+                                        num_threads=num_worker,
+                                        capacity=capacity,
+                                        min_after_dequeue=min_after_dequeue,
+                                        name="input_data")
 
         if cfg.ori_depth == 1 and cfg.target_depth == 3:
             img_data = tf.image.grayscale_to_rgb(img_data)
@@ -70,8 +69,8 @@ def get_queue(mode_str, cfg):
                 [batch_size, 1])
             return {"imgs": img_data, "lbl": labels}
 
-        labels = tf.reshape(
-            tf.to_int32(lbl_data), [batch_size, cfg.num_classes])
+        labels = tf.reshape(tf.to_int32(lbl_data),
+                            [batch_size, cfg.num_classes])
         return img_data, labels
     else:
         print("Currently --datasets has to be: \"helium\", \"cxidb\"")
@@ -102,8 +101,8 @@ def get_dataset(mode_str, cfg):
     if cfg.dataset == "cxidb" and mode_str == "predict":
         filenames = glob(cfg.data_dir + cfg.dataset + "/*train.tfrecord")
 
-    filename_queue = tf.train.string_input_producer(
-        filenames, num_epochs=num_epochs)
+    filename_queue = tf.train.string_input_producer(filenames,
+                                                    num_epochs=num_epochs)
     print(filenames)
     # Allowing None in the signature so that
     # dataset_factory can use the default.
@@ -159,62 +158,6 @@ def get_dataset(mode_str, cfg):
     image_data.set_shape([cfg.ori_width, cfg.ori_height, cfg.ori_depth])
 
     return image_data, lbl_data
-
-
-def get_cifar_dataset(mode_str, cfg):
-    """
-    Gets a dataset tuple with instructions for reading airynet.
-    Args:
-        cfg: the config class
-    Returns:
-        A `Dataset` namedtuple.
-        Raises:
-        ValueError: if `split_name` is not a valid train/test split.
-    """
-    filenames = glob(cfg.data_dir + cfg.dataset + "/*" + mode_str + "*")
-
-    # Allowing None in the signature so
-    # that dataset_factory can use the default.
-    reader = tf.TFRecordReader
-
-    keys_to_features = {
-        "image/encoded":
-        tf.FixedLenFeature((), tf.string, default_value=""),
-        "image/format":
-        tf.FixedLenFeature((), tf.string, default_value="png"),
-        "image/class/label":
-        tf.FixedLenFeature(
-            [], tf.int64, default_value=tf.zeros([], dtype=tf.int64)),
-    }
-
-    items_to_handlers = {
-        "image":
-        slim.tfexample_decoder.Image(
-            shape=[cfg.ori_width, cfg.ori_height, cfg.ori_depth],
-            channels=cfg.ori_depth),
-        "label":
-        slim.tfexample_decoder.Tensor("image/class/label"),
-    }
-
-    decoder = slim.tfexample_decoder.TFExampleDecoder(keys_to_features,
-                                                      items_to_handlers)
-
-    if cfg.mode == "train":
-        split_size = 50000
-    elif cfg.mode == "test":
-        split_size = 10000
-
-    desc = {
-        "image": "The image",
-        "label": "The label",
-    }
-    return slim.dataset.Dataset(
-        data_sources=filenames,
-        reader=reader,
-        decoder=decoder,
-        num_samples=split_size,
-        items_to_descriptions=desc,
-        num_classes=cfg.num_classes)
 
 
 def augment_data(img_data):

@@ -38,11 +38,10 @@ def vgg_arg_scope(weight_decay=1e-6):
     Returns:
     An arg_scope.
     """
-    with slim.arg_scope(
-        [slim.conv2d, slim.fully_connected],
-            activation_fn=tf.nn.relu,
-            weights_regularizer=slim.l2_regularizer(weight_decay),
-            biases_initializer=tf.zeros_initializer()):
+    with slim.arg_scope([slim.conv2d, slim.fully_connected],
+                        activation_fn=tf.nn.relu,
+                        weights_regularizer=slim.l2_regularizer(weight_decay),
+                        biases_initializer=tf.zeros_initializer()):
         with slim.arg_scope([slim.conv2d], padding="SAME") as arg_sc:
             return arg_sc
 
@@ -60,16 +59,15 @@ def conv_act(inputs,
     """
     Use global custom conv+activation function
     """
-    net = conv2d_fixed_padding(
-        inputs=inputs,
-        filters=filters,
-        kernel_size=kernel_size,
-        strides=strides,
-        data_format=data_format,
-        reuse=reuse,
-        name=scope + name,
-        activation=log_act_helper
-        if cfg.use_log_act and cfg.counter == 0 else None)
+    net = conv2d_fixed_padding(inputs=inputs,
+                               filters=filters,
+                               kernel_size=kernel_size,
+                               strides=strides,
+                               data_format=data_format,
+                               reuse=reuse,
+                               name=scope + name,
+                               activation=log_act_helper if cfg.use_log_act
+                               and cfg.counter == 0 else None)
     net = batch_norm_act_fun(net, is_training, data_format, leakiness, reuse,
                              False)
     if cfg.counter == 0:
@@ -139,70 +137,85 @@ def vgg_16(inputs,
     with tf.variable_scope(scope, "vgg_16", [inputs]):
         # Collect outputs for conv2d, fully_connected and max_pool2d.
         print("Input Shape: {}".format(inputs.get_shape()))
-        net = tf.contrib.layers.repeat(
-            inputs,
-            2,
-            conv_act,
-            64,
-            3,
-            reuse=reuse,
-            name="conv1",
-            data_format=data_format)
+        net = tf.contrib.layers.repeat(inputs,
+                                       2,
+                                       conv_act,
+                                       64,
+                                       3,
+                                       reuse=reuse,
+                                       name="conv1",
+                                       data_format=data_format)
         print("First conv block: {}".format(net.get_shape()))
-        net = tf.nn.max_pool(
-            net, pool_, pool_, "VALID", name="pool1", data_format=dat_form_old)
+        net = tf.nn.max_pool(net,
+                             pool_,
+                             pool_,
+                             "VALID",
+                             name="pool1",
+                             data_format=dat_form_old)
         print("After Max-Pooling: {}".format(net.get_shape()))
-        net = tf.contrib.layers.repeat(
-            net,
-            2,
-            conv_act,
-            128,
-            3,
-            reuse=reuse,
-            name="conv2",
-            data_format=data_format)
+        net = tf.contrib.layers.repeat(net,
+                                       2,
+                                       conv_act,
+                                       128,
+                                       3,
+                                       reuse=reuse,
+                                       name="conv2",
+                                       data_format=data_format)
         print("Second conv block: {}".format(net.get_shape()))
-        net = tf.nn.max_pool(
-            net, pool_, pool_, "VALID", name="pool2", data_format=dat_form_old)
+        net = tf.nn.max_pool(net,
+                             pool_,
+                             pool_,
+                             "VALID",
+                             name="pool2",
+                             data_format=dat_form_old)
         print("Max-Pooling: {}".format(net.get_shape()))
-        net = tf.contrib.layers.repeat(
-            net,
-            3,
-            conv_act,
-            256,
-            3,
-            reuse=reuse,
-            name="conv3",
-            data_format=data_format)
+        net = tf.contrib.layers.repeat(net,
+                                       3,
+                                       conv_act,
+                                       256,
+                                       3,
+                                       reuse=reuse,
+                                       name="conv3",
+                                       data_format=data_format)
         print("Third conv block: {}".format(net.get_shape()))
-        net = tf.nn.max_pool(
-            net, pool_, pool_, "VALID", name="pool3", data_format=dat_form_old)
+        net = tf.nn.max_pool(net,
+                             pool_,
+                             pool_,
+                             "VALID",
+                             name="pool3",
+                             data_format=dat_form_old)
         print("Max-Pooling: {}".format(net.get_shape()))
-        net = tf.contrib.layers.repeat(
-            net,
-            3,
-            conv_act,
-            512,
-            3,
-            reuse=reuse,
-            name="conv4",
-            data_format=data_format)
+        net = tf.contrib.layers.repeat(net,
+                                       3,
+                                       conv_act,
+                                       512,
+                                       3,
+                                       reuse=reuse,
+                                       name="conv4",
+                                       data_format=data_format)
         print("Fourth conv block: {}".format(net.get_shape()))
-        net = tf.nn.max_pool(
-            net, pool_, pool_, "VALID", name="pool4", data_format=dat_form_old)
+        net = tf.nn.max_pool(net,
+                             pool_,
+                             pool_,
+                             "VALID",
+                             name="pool4",
+                             data_format=dat_form_old)
         print("Max-Pooling: {}".format(net.get_shape()))
-        net = tf.contrib.layers.repeat(
-            net,
-            3,
-            conv_act,
-            512,
-            3,
-            reuse=reuse,
-            name="conv5",
-            data_format=data_format)
+        net = tf.contrib.layers.repeat(net,
+                                       3,
+                                       conv_act,
+                                       512,
+                                       3,
+                                       reuse=reuse,
+                                       name="conv5",
+                                       data_format=data_format)
         print("Fifth conv block: {}".format(net.get_shape()))
-        net = tf.nn.max_pool(
-            net, pool_, pool_, "VALID", name="pool5", data_format=dat_form_old)
+        net = tf.nn.max_pool(net,
+                             pool_,
+                             pool_,
+                             "VALID",
+                             name="pool5",
+                             data_format=dat_form_old)
         print("Max-Pooling: {}".format(net.get_shape()))
 
         print("Use conv2d instead of fully_connected layers.")
@@ -212,19 +225,20 @@ def vgg_16(inputs,
         print("Last conv block: {}".format(net.get_shape()))
 
         if global_pool:
-            net = tf.reduce_mean(
-                net, global_pool_idx, keepdims=True, name="global_pool")
+            net = tf.reduce_mean(net,
+                                 global_pool_idx,
+                                 keepdims=True,
+                                 name="global_pool")
         if num_classes:
             net = tf.nn.dropout(net, dropout_keep_prob, name="dropout7")
-            net = conv2d_fixed_padding(
-                net,
-                num_classes,
-                1,
-                1,
-                data_format,
-                activation=None,
-                name="fc8",
-                reuse=reuse)
+            net = conv2d_fixed_padding(net,
+                                       num_classes,
+                                       1,
+                                       1,
+                                       data_format,
+                                       activation=None,
+                                       name="fc8",
+                                       reuse=reuse)
             if spatial_squeeze and num_classes is not None:
                 net = tf.squeeze(net, global_pool_idx, name="fc8/squeezed")
 
@@ -294,70 +308,85 @@ def vgg_19(inputs,
     with tf.variable_scope(scope, "vgg_19", [inputs]):
         # Collect outputs for conv2d, fully_connected and max_pool2d.
         print("Input Shape: {}".format(inputs.get_shape()))
-        net = tf.contrib.layers.repeat(
-            inputs,
-            2,
-            conv_act,
-            64,
-            3,
-            reuse=reuse,
-            name="conv1",
-            data_format=data_format)
+        net = tf.contrib.layers.repeat(inputs,
+                                       2,
+                                       conv_act,
+                                       64,
+                                       3,
+                                       reuse=reuse,
+                                       name="conv1",
+                                       data_format=data_format)
         print("First conv block: {}".format(net.get_shape()))
-        net = tf.nn.max_pool(
-            net, pool_, pool_, "VALID", name="pool1", data_format=dat_form_old)
+        net = tf.nn.max_pool(net,
+                             pool_,
+                             pool_,
+                             "VALID",
+                             name="pool1",
+                             data_format=dat_form_old)
         print("After Max-Pooling: {}".format(net.get_shape()))
-        net = tf.contrib.layers.repeat(
-            net,
-            2,
-            conv_act,
-            128,
-            3,
-            reuse=reuse,
-            name="conv2",
-            data_format=data_format)
+        net = tf.contrib.layers.repeat(net,
+                                       2,
+                                       conv_act,
+                                       128,
+                                       3,
+                                       reuse=reuse,
+                                       name="conv2",
+                                       data_format=data_format)
         print("Second conv block: {}".format(net.get_shape()))
-        net = tf.nn.max_pool(
-            net, pool_, pool_, "VALID", name="pool2", data_format=dat_form_old)
+        net = tf.nn.max_pool(net,
+                             pool_,
+                             pool_,
+                             "VALID",
+                             name="pool2",
+                             data_format=dat_form_old)
         print("Max-Pooling: {}".format(net.get_shape()))
-        net = tf.contrib.layers.repeat(
-            net,
-            4,
-            conv_act,
-            256,
-            3,
-            reuse=reuse,
-            name="conv3",
-            data_format=data_format)
+        net = tf.contrib.layers.repeat(net,
+                                       4,
+                                       conv_act,
+                                       256,
+                                       3,
+                                       reuse=reuse,
+                                       name="conv3",
+                                       data_format=data_format)
         print("Third conv block: {}".format(net.get_shape()))
-        net = tf.nn.max_pool(
-            net, pool_, pool_, "VALID", name="pool3", data_format=dat_form_old)
+        net = tf.nn.max_pool(net,
+                             pool_,
+                             pool_,
+                             "VALID",
+                             name="pool3",
+                             data_format=dat_form_old)
         print("Max-Pooling: {}".format(net.get_shape()))
-        net = tf.contrib.layers.repeat(
-            net,
-            4,
-            conv_act,
-            512,
-            3,
-            reuse=reuse,
-            name="conv4",
-            data_format=data_format)
+        net = tf.contrib.layers.repeat(net,
+                                       4,
+                                       conv_act,
+                                       512,
+                                       3,
+                                       reuse=reuse,
+                                       name="conv4",
+                                       data_format=data_format)
         print("Fourth conv block: {}".format(net.get_shape()))
-        net = tf.nn.max_pool(
-            net, pool_, pool_, "VALID", name="pool4", data_format=dat_form_old)
+        net = tf.nn.max_pool(net,
+                             pool_,
+                             pool_,
+                             "VALID",
+                             name="pool4",
+                             data_format=dat_form_old)
         print("Max-Pooling: {}".format(net.get_shape()))
-        net = tf.contrib.layers.repeat(
-            net,
-            3,
-            conv_act,
-            512,
-            3,
-            reuse=reuse,
-            name="conv5",
-            data_format=data_format)
+        net = tf.contrib.layers.repeat(net,
+                                       3,
+                                       conv_act,
+                                       512,
+                                       3,
+                                       reuse=reuse,
+                                       name="conv5",
+                                       data_format=data_format)
         print("Fifth conv block: {}".format(net.get_shape()))
-        net = tf.nn.max_pool(
-            net, pool_, pool_, "VALID", name="pool5", data_format=dat_form_old)
+        net = tf.nn.max_pool(net,
+                             pool_,
+                             pool_,
+                             "VALID",
+                             name="pool5",
+                             data_format=dat_form_old)
         print("Max-Pooling: {}".format(net.get_shape()))
 
         print("Use conv2d instead of fully_connected layers.")
@@ -367,19 +396,20 @@ def vgg_19(inputs,
         print("Last conv block: {}".format(net.get_shape()))
 
         if global_pool:
-            net = tf.reduce_mean(
-                net, global_pool_idx, keepdims=True, name="global_pool")
+            net = tf.reduce_mean(net,
+                                 global_pool_idx,
+                                 keepdims=True,
+                                 name="global_pool")
         if num_classes:
             net = tf.nn.dropout(net, dropout_keep_prob, name="dropout7")
-            net = conv2d_fixed_padding(
-                net,
-                num_classes,
-                1,
-                1,
-                data_format,
-                activation=None,
-                name="fc8",
-                reuse=reuse)
+            net = conv2d_fixed_padding(net,
+                                       num_classes,
+                                       1,
+                                       1,
+                                       data_format,
+                                       activation=None,
+                                       name="fc8",
+                                       reuse=reuse)
             if spatial_squeeze and num_classes is not None:
                 net = tf.squeeze(net, global_pool_idx, name="fc8/squeezed")
 
@@ -410,17 +440,15 @@ def airynet_vgg_variant_generator(layers, num_classes, data_format=None):
         Constructs the airynet model given the inputs.
         """
         if layers == 16:
-            return vgg_16(
-                inputs,
-                num_classes=num_classes,
-                is_training=is_training,
-                data_format=cfg.data_format)
+            return vgg_16(inputs,
+                          num_classes=num_classes,
+                          is_training=is_training,
+                          data_format=cfg.data_format)
         else:
-            return vgg_19(
-                inputs,
-                num_classes=num_classes,
-                is_training=is_training,
-                data_format=cfg.data_format)
+            return vgg_19(inputs,
+                          num_classes=num_classes,
+                          is_training=is_training,
+                          data_format=cfg.data_format)
 
     model.default_image_size = 224
     return model

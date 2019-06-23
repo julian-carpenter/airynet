@@ -153,8 +153,8 @@ class PredictionHook(session_run_hook.SessionRunHook):
             "images":
             self.graph.get_operation_by_name("images").outputs[0],
             "preds":
-            self.graph.get_operation_by_name("sigmoid_output_classes").outputs[
-                0],
+            self.graph.get_operation_by_name(
+                "sigmoid_output_classes").outputs[0],
             "probs":
             self.graph.get_operation_by_name("sigmoid_output").outputs[0],
             "conv":
@@ -181,10 +181,11 @@ class PredictionHook(session_run_hook.SessionRunHook):
                 probs_ = run_values.results["probs"][idx]
 
                 if cfg.dataset == "cxidb":
-                    grp = fid.create_group("{}".format(
-                        np.squeeze(self.counter)))
-                    grp.create_dataset(
-                        "ground_truth", data=np.squeeze(bids_), dtype="f")
+                    grp = fid.create_group("{}".format(np.squeeze(
+                        self.counter)))
+                    grp.create_dataset("ground_truth",
+                                       data=np.squeeze(bids_),
+                                       dtype="f")
                     grp.create_dataset(
                         "pred",
                         data=np.argmax(probs_).astype(int).squeeze(),
@@ -199,9 +200,8 @@ class PredictionHook(session_run_hook.SessionRunHook):
                     # print(np.shape(grads_))
                     weights = np.mean(grads_, axis=(-2, -1))
                     # print(np.shape(weights))
-                    cam = np.ones(
-                        run_values.results["conv"].shape[-2:],
-                        dtype=np.float32)
+                    cam = np.ones(run_values.results["conv"].shape[-2:],
+                                  dtype=np.float32)
                     # print(np.shape(cam))
                     # Taking a weighted average
                     for i, w in enumerate(weights):
@@ -214,11 +214,14 @@ class PredictionHook(session_run_hook.SessionRunHook):
                         cam, (cfg.target_width, cfg.target_width))
 
                     class_group = grp.create_group("{}".format(class_idx))
-                    class_group.create_dataset(
-                        "grad_cam", data=np.squeeze(grad_cam_img), dtype="f")
+                    class_group.create_dataset("grad_cam",
+                                               data=np.squeeze(grad_cam_img),
+                                               dtype="f")
 
                 grp.create_dataset("img", data=images_.squeeze(), dtype="f")
-                grp.create_dataset(
-                    "prediction", data=np.round(preds_).squeeze(), dtype="i")
-                grp.create_dataset(
-                    "probability", data=probs_.squeeze(), dtype="f")
+                grp.create_dataset("prediction",
+                                   data=np.round(preds_).squeeze(),
+                                   dtype="i")
+                grp.create_dataset("probability",
+                                   data=probs_.squeeze(),
+                                   dtype="f")

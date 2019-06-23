@@ -1,21 +1,22 @@
-# Using deep neural nets for classification of diffraction images
+# Deep neural networks for classifying complex features in diffraction images
 
 ## Description
 
-Code for an upcoming paper; "Using deep neural networks for
-classifying complex features in diffraction images", Zimmermann et al..
+Code for : "Deep neural networks for classifying complex features in diffraction images", Zimmermann et al (2019) (Phys. Rev. E 99, 063309)
 
 **Not yet released and not yet ready for deployment.**
 
 
 ## Abstract
 
-Intense short-wavelength pulses from free-electron lasers and high-harmonic-generation sources enable diffractive imaging of individual nano-sized objects with a single x-ray laser shot. The enormous data sets with up to several million diffraction patterns represent a severe problem for data analysis, due to the high dimensionality of imaging data. Feature recognition and selection is a crucial step to reduce the dimensionality. Usually, custom-made algorithms are developed at a considerable effort to approximate the particular features connected to an individual specimen, but facing different experimental conditions, these approaches do not generalize well. On the other hand, deep neural networks are the principal instrument for today's revolution in automated image recognition, a development that has not been adapted to its full potential for data analysis in science. We recently published in \citet{Langbehn2018} the first application of a deep neural network as a feature extractor for wide-angle diffraction images of helium nanodroplets. Here we present the setup, our modifications and the training process of the deep neural network for diffraction image classification and its systematic benchmarking. We find that deep neural networks significantly outperform previous attempts for sorting and classifying complex diffraction patterns and are a significant improvement for the much-needed assistance during post-processing of large amounts of experimental coherent diffraction imaging data.
+Intense short-wavelength pulses from free-electron lasers and high-harmonic-generation sources enable diffractive imaging of individual nano-sized objects with a single x-ray laser shot. The enormous data sets with up to several million diffraction patterns represent a severe problem for data analysis, due to the high dimensionality of imaging data. Feature recognition and selection is a crucial step to reduce the dimensionality. Usually, custom-made algorithms are developed at a considerable effort to approximate the particular features connected to an individual specimen, but facing different experimental conditions, these approaches do not generalize well. On the other hand, deep neural networks are the principal instrument for today's revolution in automated image recognition, a development that has not been adapted to its full potential for data analysis in science. We recently published in [Langbehn et al. Phys. Rev. Lett. 121, 255301 (2018)] the first application of a deep neural network as a feature extractor for wide-angle diffraction images of helium nanodroplets. Here we present the setup, our modifications and the training process of the deep neural network for diffraction image classification and its systematic benchmarking. We find that deep neural networks significantly outperform previous attempts for sorting and classifying complex diffraction patterns and are a significant improvement for the much-needed assistance during post-processing of large amounts of experimental coherent diffraction imaging data.
 
 ## Requirements
 * Python 3.6+ (Mainly because of the _print("...{}...".format(...)))_ statements)
-* _Tensorflow_ 1.4+ (Only tested on 1.7+ though)
+* _Tensorflow_ 1.7+
 * The following Python packages: _os_, _glob_, _datetime_, _tqdm_, _argparse_, _cv2_, _h5py_ and _numpy_
+
+### WE HIGHLY RECOMMEND TO WRITE YOUR OWN DATA-INPUT ROUTINE, nn/data.py IS HIGHLY SPECIFIC TO THE DATA WE USED IN OUR EXPERIMENTS.
 
 ## Usage
 ```python
@@ -135,6 +136,13 @@ Possible flags: # declared in _nn/config.py_
 "--random_seed",
     type=int,
     help="Use the same random seed for reproducibility")
-
-
 ```
+
+## GradCam++ Output
+The Prediction hook defined in nn/utils.py generates a large h5 File that includes:
+* bids (Obtained from the _label_ Protobuf field)
+* images (The original image)
+* preds (The predictions -> round(logit(x)))
+* probs (Probabilities -> Sigmoid output)
+* conv (Filter of the last convolutional layer)
+* grads (GradCam++ Gradients)

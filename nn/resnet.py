@@ -46,8 +46,11 @@ def building_layer(inputs, filters, is_training, projection_shortcut, strides,
     """
     with tf.variable_scope("pre_activation_and_shortcuts"):
         shortcut = inputs
-        inputs = batch_norm_act_fun(
-            inputs, is_training, data_format, relu_leakiness, reuse=reuse)
+        inputs = batch_norm_act_fun(inputs,
+                                    is_training,
+                                    data_format,
+                                    relu_leakiness,
+                                    reuse=reuse)
 
         # The projection shortcut should come after the first
         # batch norm and ReLU since it performs a 1x1 convolution.
@@ -55,24 +58,25 @@ def building_layer(inputs, filters, is_training, projection_shortcut, strides,
             shortcut = projection_shortcut(inputs)
 
     with tf.variable_scope("conv_one"):
-        inputs = conv2d_fixed_padding(
-            inputs=inputs,
-            filters=filters,
-            kernel_size=3,
-            strides=strides,
-            data_format=data_format,
-            reuse=reuse)
+        inputs = conv2d_fixed_padding(inputs=inputs,
+                                      filters=filters,
+                                      kernel_size=3,
+                                      strides=strides,
+                                      data_format=data_format,
+                                      reuse=reuse)
 
     with tf.variable_scope("conv_two"):
-        inputs = batch_norm_act_fun(
-            inputs, is_training, data_format, relu_leakiness, reuse=reuse)
-        inputs = conv2d_fixed_padding(
-            inputs=inputs,
-            filters=filters,
-            kernel_size=3,
-            strides=1,
-            data_format=data_format,
-            reuse=reuse)
+        inputs = batch_norm_act_fun(inputs,
+                                    is_training,
+                                    data_format,
+                                    relu_leakiness,
+                                    reuse=reuse)
+        inputs = conv2d_fixed_padding(inputs=inputs,
+                                      filters=filters,
+                                      kernel_size=3,
+                                      strides=1,
+                                      data_format=data_format,
+                                      reuse=reuse)
 
     return inputs + shortcut
 
@@ -100,8 +104,11 @@ def bottleneck_layer(inputs, filters, is_training, projection_shortcut,
     """
     with tf.variable_scope("pre_activation_and_shortcuts"):
         shortcut = inputs
-        inputs = batch_norm_act_fun(
-            inputs, is_training, data_format, relu_leakiness, reuse=reuse)
+        inputs = batch_norm_act_fun(inputs,
+                                    is_training,
+                                    data_format,
+                                    relu_leakiness,
+                                    reuse=reuse)
 
         # The projection shortcut should come after the first
         # batch norm and ReLU since it performs a 1x1 convolution.
@@ -109,35 +116,38 @@ def bottleneck_layer(inputs, filters, is_training, projection_shortcut,
         if projection_shortcut is not None:
             shortcut = projection_shortcut(inputs)
     with tf.variable_scope("conv_one"):
-        inputs = conv2d_fixed_padding(
-            inputs=inputs,
-            filters=filters,
-            kernel_size=1,
-            strides=1,
-            data_format=data_format,
-            reuse=reuse)
+        inputs = conv2d_fixed_padding(inputs=inputs,
+                                      filters=filters,
+                                      kernel_size=1,
+                                      strides=1,
+                                      data_format=data_format,
+                                      reuse=reuse)
 
     with tf.variable_scope("conv_two"):
-        inputs = batch_norm_act_fun(
-            inputs, is_training, data_format, relu_leakiness, reuse=reuse)
-        inputs = conv2d_fixed_padding(
-            inputs=inputs,
-            filters=filters,
-            kernel_size=3,
-            strides=strides,
-            data_format=data_format,
-            reuse=reuse)
+        inputs = batch_norm_act_fun(inputs,
+                                    is_training,
+                                    data_format,
+                                    relu_leakiness,
+                                    reuse=reuse)
+        inputs = conv2d_fixed_padding(inputs=inputs,
+                                      filters=filters,
+                                      kernel_size=3,
+                                      strides=strides,
+                                      data_format=data_format,
+                                      reuse=reuse)
 
     with tf.variable_scope("conv_three"):
-        inputs = batch_norm_act_fun(
-            inputs, is_training, data_format, relu_leakiness, reuse=reuse)
-        inputs = conv2d_fixed_padding(
-            inputs=inputs,
-            filters=4 * filters,
-            kernel_size=1,
-            strides=1,
-            data_format=data_format,
-            reuse=reuse)
+        inputs = batch_norm_act_fun(inputs,
+                                    is_training,
+                                    data_format,
+                                    relu_leakiness,
+                                    reuse=reuse)
+        inputs = conv2d_fixed_padding(inputs=inputs,
+                                      filters=4 * filters,
+                                      kernel_size=1,
+                                      strides=1,
+                                      data_format=data_format,
+                                      reuse=reuse)
 
     return inputs + shortcut
 
@@ -169,13 +179,12 @@ def block_layer_fn(inputs, filters, layer_fn, block_layer, strides,
     filters_out = 4 * filters if layer_fn is bottleneck_layer else filters
 
     def projection_shortcut(inputs):
-        return conv2d_fixed_padding(
-            inputs=inputs,
-            filters=filters_out,
-            kernel_size=1,
-            strides=strides,
-            data_format=data_format,
-            reuse=reuse)
+        return conv2d_fixed_padding(inputs=inputs,
+                                    filters=filters_out,
+                                    kernel_size=1,
+                                    strides=strides,
+                                    data_format=data_format,
+                                    reuse=reuse)
 
     # Only the first layer per block uses projection_shortcut and strides
     with tf.variable_scope("layer_0"):
@@ -234,8 +243,8 @@ def airynet_resnet_variant_generator(layer_fn,
                 print("_____________")
 
             def log_act_helper(x):
-                return tf.where(
-                    tf.greater(x, 0), log_act(x), log_act(x, False))
+                return tf.where(tf.greater(x, 0), log_act(x),
+                                log_act(x, False))
 
             # this is the log layer
             inputs = conv2d_fixed_padding(
@@ -248,81 +257,78 @@ def airynet_resnet_variant_generator(layer_fn,
                 activation=log_act_helper if cfg.use_log_act else None)
             inputs = tf.identity(inputs, "initial_conv")
             print("After the first convolution: {}".format(inputs.get_shape()))
-            inputs = tf.layers.max_pooling2d(
-                inputs=inputs,
-                pool_size=3,
-                strides=2,
-                padding="SAME",
-                data_format=data_format)
+            inputs = tf.layers.max_pooling2d(inputs=inputs,
+                                             pool_size=3,
+                                             strides=2,
+                                             padding="SAME",
+                                             data_format=data_format)
             inputs = tf.identity(inputs, "initial_max_pool")
             print("After Max Pooling with pool size three: {}".format(
                 inputs.get_shape()))
 
         with tf.variable_scope("first_block"):
-            inputs = block_layer_fn(
-                inputs=inputs,
-                filters=64,
-                layer_fn=layer_fn,
-                block_layer=layers[0],
-                strides=1,
-                is_training=is_training,
-                name="first_block_layer_fn",
-                data_format=data_format,
-                relu_leakiness=relu_leakiness,
-                reuse=reuse)
+            inputs = block_layer_fn(inputs=inputs,
+                                    filters=64,
+                                    layer_fn=layer_fn,
+                                    block_layer=layers[0],
+                                    strides=1,
+                                    is_training=is_training,
+                                    name="first_block_layer_fn",
+                                    data_format=data_format,
+                                    relu_leakiness=relu_leakiness,
+                                    reuse=reuse)
             print("After the first block: {}".format(inputs.get_shape()))
 
         with tf.variable_scope("second_block"):
-            inputs = block_layer_fn(
-                inputs=inputs,
-                filters=128,
-                layer_fn=layer_fn,
-                block_layer=layers[1],
-                strides=2,
-                is_training=is_training,
-                name="second_block_layer_fn",
-                data_format=data_format,
-                relu_leakiness=relu_leakiness,
-                reuse=reuse)
+            inputs = block_layer_fn(inputs=inputs,
+                                    filters=128,
+                                    layer_fn=layer_fn,
+                                    block_layer=layers[1],
+                                    strides=2,
+                                    is_training=is_training,
+                                    name="second_block_layer_fn",
+                                    data_format=data_format,
+                                    relu_leakiness=relu_leakiness,
+                                    reuse=reuse)
             print("After the second block: {}".format(inputs.get_shape()))
 
         with tf.variable_scope("third_block"):
-            inputs = block_layer_fn(
-                inputs=inputs,
-                filters=256,
-                layer_fn=layer_fn,
-                block_layer=layers[2],
-                strides=2,
-                is_training=is_training,
-                name="third_block_layer_fn",
-                data_format=data_format,
-                relu_leakiness=relu_leakiness,
-                reuse=reuse)
+            inputs = block_layer_fn(inputs=inputs,
+                                    filters=256,
+                                    layer_fn=layer_fn,
+                                    block_layer=layers[2],
+                                    strides=2,
+                                    is_training=is_training,
+                                    name="third_block_layer_fn",
+                                    data_format=data_format,
+                                    relu_leakiness=relu_leakiness,
+                                    reuse=reuse)
             print("After the third block: {}".format(inputs.get_shape()))
 
         with tf.variable_scope("fourth_block"):
-            inputs = block_layer_fn(
-                inputs=inputs,
-                filters=512,
-                layer_fn=layer_fn,
-                block_layer=layers[3],
-                strides=2,
-                is_training=is_training,
-                name="last_block_before_fc",
-                data_format=data_format,
-                relu_leakiness=relu_leakiness,
-                reuse=reuse)
+            inputs = block_layer_fn(inputs=inputs,
+                                    filters=512,
+                                    layer_fn=layer_fn,
+                                    block_layer=layers[3],
+                                    strides=2,
+                                    is_training=is_training,
+                                    name="last_block_before_fc",
+                                    data_format=data_format,
+                                    relu_leakiness=relu_leakiness,
+                                    reuse=reuse)
             print("After the fourth block: {}".format(inputs.get_shape()))
 
         with tf.variable_scope("nn_out"):
-            inputs = batch_norm_act_fun(
-                inputs, is_training, data_format, relu_leakiness, reuse=reuse)
-            inputs = tf.layers.average_pooling2d(
-                inputs=inputs,
-                pool_size=7,
-                strides=1,
-                padding="VALID",
-                data_format=data_format)
+            inputs = batch_norm_act_fun(inputs,
+                                        is_training,
+                                        data_format,
+                                        relu_leakiness,
+                                        reuse=reuse)
+            inputs = tf.layers.average_pooling2d(inputs=inputs,
+                                                 pool_size=7,
+                                                 strides=1,
+                                                 padding="VALID",
+                                                 data_format=data_format)
             inputs = tf.identity(inputs, "final_avg_pool")
             print("After Max Pooling with pool size seven: {}".format(
                 inputs.get_shape()))

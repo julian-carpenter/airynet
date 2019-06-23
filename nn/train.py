@@ -13,9 +13,10 @@ def model_fn(features, labels, mode, params):
 
     def select_architecture(arc="resnet"):
         if arc == "resnet":
-            model_fn = nn.airynet_resnet_variant(
-                cfg.resnet_size, cfg.num_classes, cfg.data_format,
-                cfg.relu_leakiness)
+            model_fn = nn.airynet_resnet_variant(cfg.resnet_size,
+                                                 cfg.num_classes,
+                                                 cfg.data_format,
+                                                 cfg.relu_leakiness)
         elif arc == "vgg":
             model_fn = nn.airynet_vgg_variant(cfg.vgg_size, cfg.num_classes,
                                               cfg.data_format)
@@ -54,8 +55,9 @@ def model_fn(features, labels, mode, params):
         tf.identity(learning_rate, name="learning_rate")
         tf.summary.scalar("learning_rate", learning_rate)
 
-        optimizer = tf.train.MomentumOptimizer(
-            learning_rate=learning_rate, momentum=cfg.gamma, use_nesterov=True)
+        optimizer = tf.train.MomentumOptimizer(learning_rate=learning_rate,
+                                               momentum=cfg.gamma,
+                                               use_nesterov=True)
 
     avail_gpus = get_available_gpus()
     tower_grads = []
@@ -130,8 +132,8 @@ def model_fn(features, labels, mode, params):
     predictions = {
         "classes":
         tf.round(
-            fc_out_activation_fun(
-                logits, name=fc_out_activation_name + "_classes")),
+            fc_out_activation_fun(logits,
+                                  name=fc_out_activation_name + "_classes")),
         "probabilities":
         fc_out_activation_fun(logits, name=fc_out_activation_name),
         "bunchID":
@@ -156,23 +158,21 @@ def model_fn(features, labels, mode, params):
         for class_idx in range(out_.get_shape()[-1]):
             print("Building GradCam for class: {}".format(class_idx))
             heat_loss_.append(
-                tf.reduce_mean(
-                    out_[:, class_idx],
-                    name="class_loss_{}".format(class_idx)))
+                tf.reduce_mean(out_[:, class_idx],
+                               name="class_loss_{}".format(class_idx)))
             curr_grad = tf.gradients(
                 heat_loss_, conv_, name="class_grads_{}".format(class_idx))[0]
             grads.append(curr_grad)
             norm.append(
-                tf.sqrt(
-                    tf.reduce_mean(tf.square(curr_grad)),
-                    name="class_norm_{}".format(class_idx)))
+                tf.sqrt(tf.reduce_mean(tf.square(curr_grad)),
+                        name="class_norm_{}".format(class_idx)))
             normed_grads.append(
-                tf.divide(
-                    tf.convert_to_tensor(grads[class_idx]),
-                    tf.convert_to_tensor(norm[class_idx]) + tf.constant(1e-5),
-                    name="normalized_grads_{}".format(class_idx)))
-        tf.identity(
-            tf.convert_to_tensor(normed_grads), name="normalized_grads")
+                tf.divide(tf.convert_to_tensor(grads[class_idx]),
+                          tf.convert_to_tensor(norm[class_idx]) +
+                          tf.constant(1e-5),
+                          name="normalized_grads_{}".format(class_idx)))
+        tf.identity(tf.convert_to_tensor(normed_grads),
+                    name="normalized_grads")
         return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
 
     # Create some metrics for logging purposes
@@ -188,10 +188,9 @@ def model_fn(features, labels, mode, params):
 
         # Calculate the confusion matrix
         confusion_matr = tf.to_float(
-            tf.confusion_matrix(
-                tf.reshape(lbl, [-1]),
-                tf.reshape(prediction, [-1]),
-                num_classes=2))
+            tf.confusion_matrix(tf.reshape(lbl, [-1]),
+                                tf.reshape(prediction, [-1]),
+                                num_classes=2))
         tf.identity(confusion_matr, name="confusion_matr")
 
         # Matthews Correlation Coefficient
@@ -206,15 +205,13 @@ def model_fn(features, labels, mode, params):
 
         # Stack lbl and predictions as image for the summary
         lbl_vs_prediction = tf.multiply(tf.ones_like(lbl), 255)
-        lbl_vs_prediction = tf.expand_dims(
-            tf.stack(
-                [
-                    tf.multiply(lbl_vs_prediction, lbl),
-                    tf.multiply(lbl_vs_prediction, prediction),
-                    tf.zeros_like(lbl)
-                ],
-                axis=-1),
-            axis=0)
+        lbl_vs_prediction = tf.expand_dims(tf.stack([
+            tf.multiply(lbl_vs_prediction, lbl),
+            tf.multiply(lbl_vs_prediction, prediction),
+            tf.zeros_like(lbl)
+        ],
+                                                    axis=-1),
+                                           axis=0)
         tf.identity(lbl_vs_prediction, name="lbl_vs_prediction")
         tf.summary.image("metrics/lbl_vs_prediction", lbl_vs_prediction)
 
@@ -222,8 +219,8 @@ def model_fn(features, labels, mode, params):
         tf.identity(lbl_image, name="lbl_image")
         tf.summary.image("metrics/lbl_image", lbl_image)
 
-        prediction_image = tf.expand_dims(
-            tf.expand_dims(prediction, axis=-1), axis=0)
+        prediction_image = tf.expand_dims(tf.expand_dims(prediction, axis=-1),
+                                          axis=0)
         tf.identity(prediction_image, name="prediction_image")
         tf.summary.image("metrics/prediction_image", prediction_image)
 
@@ -246,12 +243,11 @@ def model_fn(features, labels, mode, params):
         "false_negatives": eval_fn
     }
 
-    return tf.estimator.EstimatorSpec(
-        mode=mode,
-        predictions=predictions,
-        loss=loss,
-        train_op=train_op,
-        eval_metric_ops=metrics)
+    return tf.estimator.EstimatorSpec(mode=mode,
+                                      predictions=predictions,
+                                      loss=loss,
+                                      train_op=train_op,
+                                      eval_metric_ops=metrics)
 
 
 def get_available_gpus():
