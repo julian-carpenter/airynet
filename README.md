@@ -16,7 +16,7 @@ Intense short-wavelength pulses from free-electron lasers and high-harmonic-gene
 * _Tensorflow_ 1.7+
 * The following Python packages: _os_, _glob_, _datetime_, _tqdm_, _argparse_, _cv2_, _h5py_ and _numpy_
 
-### WE HIGHLY RECOMMEND TO WRITE YOUR OWN DATA-INPUT ROUTINE, nn/data.py IS HIGHLY SPECIFIC TO THE DATA WE USED IN OUR EXPERIMENTS.
+** WE HIGHLY RECOMMEND TO WRITE YOUR OWN DATA-INPUT ROUTINE, nn/data.py IS HIGHLY SPECIFIC TO THE DATA WE USED IN OUR EXPERIMENTS **
 
 ## Usage
 ```python
