@@ -4,7 +4,7 @@
 
 Code for : "Deep neural networks for classifying complex features in diffraction images", Zimmermann et al (2019) (Phys. Rev. E 99, 063309)
 
-**Not yet released and not yet ready for deployment.**
+**https://journals.aps.org/pre/abstract/10.1103/PhysRevE.99.063309**
 
 
 ## Abstract
